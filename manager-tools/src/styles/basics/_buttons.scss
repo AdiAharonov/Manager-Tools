@@ -1,0 +1,41 @@
+.navbar-btn {
+    background: none;
+    border: none;
+    color: $clr4;
+    cursor: pointer;
+    font-family: roboto-mono;
+    font-size: 0.8rem;
+    outline: none;
+    transition: all ease-out .7s;
+    outline: none;
+    margin: auto 0;
+
+    &:hover {
+        color: $clr3;
+    }
+}
+
+.resume-btn {
+    background: none;
+    border: 1px solid $clr3;
+    color: $clr3;
+    padding: 10px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: roboto-mono;
+    transition: all ease-in-out .2s;
+    outline: none;
+    text-decoration: none;
+
+    &:hover {
+        background-color: transparentize($clr3, 0.9);
+        @include hover-supported
+    }
+    
+
+    .landing & {
+        padding: 17px;
+    }
+
+}
+ 
