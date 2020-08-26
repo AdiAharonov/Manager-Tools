@@ -14,7 +14,9 @@
 @import "basics/buttons.scss";
 
 // Components
-
+@import "cmps/tool-bar";
+@import "cmps/upload-image-tool";
 
 // Pages
 @import "pages/home";
+@import "pages/new-project";

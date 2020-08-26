@@ -1,6 +1,6 @@
 import React from 'react';
 import { Home } from './Pages/Home';
-import { NewProject } from './Pages/NewProject';
+import NewProject  from './Pages/NewProject';
 import { Route, Switch } from 'react-router-dom'
 
 function App() {
