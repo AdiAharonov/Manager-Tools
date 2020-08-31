@@ -6,7 +6,7 @@ const gCategories: { name: string; link: string }[] = [
 ];
 
 
-let gLayerIdx = 101;
+let gLayerIdx = 1;
 
 
 const gLayers: { id: number, name: string; formation: number[] }[] = [
@@ -21,9 +21,9 @@ const getGLayers = () => {
 };
 
 const createNewLayer = () => {
-  const newLayer = { id: ++gLayerIdx, name: 'New Layer', formation: [] };
+  const newLayer = { id: ++gLayerIdx, name: `New Layer ${gLayerIdx}`, formation: [] };
   gLayers.push(newLayer);
-  return newLayer;
+  return gLayers;
 };
 
 const updateLayer = (id: number, formation: number[]) => {

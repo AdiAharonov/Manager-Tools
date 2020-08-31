@@ -1,10 +1,12 @@
 import React, { useState} from 'react'
 import {UploadImageTool} from './UploadImageTool';
 import {PenTool} from './PenTool';
+import {RectTool} from './RectTool';
 
 interface ToolBarProps  {
     uploadImg: Function,
-    setCurrTool: Function
+    setCurrTool: Function,
+    handleOpenModal: Function
 }
 
 
@@ -15,7 +17,7 @@ export const ToolBar:React.FC<ToolBarProps> = ({uploadImg, setCurrTool}) => {
     const handleClick = (ev: Event, toolName: string) => {
 
         // Turn on/off the current tool
-
+        console.log(toolName)
         if (currTool === '') {
             setNewCurrTool(toolName);
             setCurrTool(toolName);
@@ -33,6 +35,7 @@ export const ToolBar:React.FC<ToolBarProps> = ({uploadImg, setCurrTool}) => {
             <div className="toolbar">
             <UploadImageTool uploadImg={uploadImg} />
             <PenTool handleClick={handleClick}/>
+            <RectTool handleClick={handleClick}/>
             </div>
         </>
     )

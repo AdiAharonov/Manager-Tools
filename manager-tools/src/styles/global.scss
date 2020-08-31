@@ -16,7 +16,12 @@
 // Components
 @import "cmps/tool-bar";
 @import "cmps/upload-image-tool";
+@import "cmps/modal";
 
 // Pages
 @import "pages/home";
 @import "pages/new-project";
+
+
+// Libreries
+@import "~bootstrap/scss/bootstrap";
