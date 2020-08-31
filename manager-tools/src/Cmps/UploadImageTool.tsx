@@ -1,13 +1,14 @@
 import React from 'react';
 import axios from 'axios';
 
-interface ToolBarProps  {
-    uploadImg: Function
+interface UploadImageProps  {
+    uploadImg: Function,
+    
 }
 
 
 
-export const UploadImageTool:React.FC<ToolBarProps> = ({uploadImg}) => {
+export const UploadImageTool:React.FC<UploadImageProps> = ({uploadImg}) => {
 
     const inputHandler = async (ev: any) => {
         const image = ev.target.files[0];
@@ -20,9 +21,10 @@ export const UploadImageTool:React.FC<ToolBarProps> = ({uploadImg}) => {
 
     }
 
+
     return (
-        <>
+        <div className="upload-image tool">
             <input type="file" name="file" onChange={inputHandler}/>
-        </>
+        </div>
     )
 }
