@@ -1,23 +1,29 @@
 import React from 'react';
-
+import Basic from './Forms/RectToolForm';
 
 
 interface ModalProps  {
-    showModal: boolean
+    showModal: boolean,
+    modalName: string,
+    handleCloseModal: Function,
+    createRect: Function
 }
 
 
-export const Modal:React.FC<ModalProps> = ({showModal}) => {
+export const Modal:React.FC<ModalProps> = ({showModal, modalName, handleCloseModal, createRect}) => {
 
+    const display = !showModal ? {display: "none"} : {};
 
 
     return (
-        <div className="modal">
+        
+        <div className="global-modal" style={display} >
+            <div className="modal-background" onClick={() => handleCloseModal()}></div>
         { showModal && <div className="modal-body">
         
-            <h2>modal</h2>
-            <input type="text" />
-            <div className="modal-background"></div>
+            <h2>{modalName}</h2>
+            <Basic handleCloseModal={handleCloseModal} createRect={createRect}/>
+            
         </div>}
         </div>
     )

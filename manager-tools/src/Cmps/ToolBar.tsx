@@ -17,8 +17,8 @@ export const ToolBar:React.FC<ToolBarProps> = ({uploadImg, setCurrTool}) => {
     const handleClick = (ev: Event, toolName: string) => {
 
         // Turn on/off the current tool
-        console.log(toolName)
-        if (currTool === '') {
+       
+        if (currTool === '' || currTool !== toolName) {
             setNewCurrTool(toolName);
             setCurrTool(toolName);
         }
@@ -27,6 +27,7 @@ export const ToolBar:React.FC<ToolBarProps> = ({uploadImg, setCurrTool}) => {
             setCurrTool('');
         }
         
+    
         
     }
 

@@ -1,10 +1,11 @@
 import React, { Component, MouseEvent } from 'react';
 import { ToolBar } from '../Cmps/ToolBar';
-import { Stage, Layer, Image, Line } from 'react-konva';
+import { Stage, Layer, Image, Line, Rect } from 'react-konva';
 import Konva from 'konva';
 import useImage from 'use-image';
 import { globalService } from '../Services/globalServices';
 import { Modal } from '../Cmps/Modal';
+import { CanvasGridLayer } from '../Cmps/CanvasGridLayer';
 
 const BgImage: React.FC<{ url: string }> = ({ url }) => {
   const [image] = useImage(url);
@@ -24,7 +25,16 @@ interface State {
   currLayer: { id: number; name: string; formation: number[] };
   layers: { id: number; name: string; formation: number[] }[];
   loading: boolean;
-  showModal: boolean
+  modal: { showModal: boolean; modalTitle: string };
+  rectangels: {
+    name: String;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+  }[];
+  isDraggin: boolean;
+  currElementCoords: { x: number; y: number };
 }
 
 class NewProject extends Component {
@@ -35,7 +45,10 @@ class NewProject extends Component {
     currLayer: { id: 101, name: 'Default Layer', formation: [] },
     layers: [],
     loading: true,
-    showModal: true
+    modal: { showModal: false, modalTitle: 'Default' },
+    rectangels: [],
+    isDraggin: false,
+    currElementCoords: { x: 0, y: 0 },
   };
 
   componentDidMount() {
@@ -47,6 +60,12 @@ class NewProject extends Component {
     });
   }
 
+  componentDidUpdate(prevState: State) {
+    if (prevState.currElementCoords !== this.state.currElementCoords) {
+      // console.log(this.state.currElementCoords);
+    }
+  }
+
   // Set the background image
 
   uploadImg = (url: string) => {
@@ -55,9 +74,8 @@ class NewProject extends Component {
 
   setCurrTool = (toolName: string) => {
     this.setState({ currTool: toolName });
+    this.handleOpenModal(toolName);
   };
-
-  
 
   // Canvas options
 
@@ -97,7 +115,6 @@ class NewProject extends Component {
     });
   };
 
-
   // Draw tool
 
   handleMouseDown = (ev: Konva.KonvaEventObject<MouseEvent>) => {
@@ -115,24 +132,56 @@ class NewProject extends Component {
     });
   };
 
+  // Shapes
+
+  createRect = (name: string, width: number, height: number) => {
+    globalService.createRect(name, width, height);
+    this.setState({ rectangels: globalService.getRectangels() });
+  };
+
+  updateRectangels = (rect: { name: String; width: number; height: number; x: number; y: number; }) => {
+    const updatedRectangels: { name: String; width: number; height: number; x: number; y: number; }[] = globalService.updateRectangels(rect, this.state.currElementCoords);
+    this.setState({ rectangels: updatedRectangels })
+  };
+
   // Modal
 
   handleCloseModal = () => {
-    this.setState({ showModal: false })
-  }
+    if (this.state.modal.modalTitle) {
+      this.setState({ modal: { modalTitle: '' } });
+    }
+    this.setState({ modal: { showModal: false } });
+  };
 
-  handleOpenModal = () => {
-    this.setState({ showModal: true })
-  }
+  handleOpenModal = (title: string) => {
+    if (!title) {
+      this.handleCloseModal();
+      return;
+    }
+    this.setState({ modal: { showModal: true, modalTitle: title } });
+  };
 
-  
   render() {
-    const { img, layers, showModal, currLayer, loading } = this.state;
+    const {
+      img,
+      layers,
+      modal,
+      currLayer,
+      loading,
+      currTool,
+      rectangels,
+      isDraggin,
+    } = this.state;
 
     return (
       <div className="new-project">
-        <ToolBar uploadImg={this.uploadImg} setCurrTool={this.setCurrTool} handleOpenModal={this.handleOpenModal} />
+        <ToolBar
+          uploadImg={this.uploadImg}
+          setCurrTool={this.setCurrTool}
+          handleOpenModal={this.handleOpenModal}
+        />
 
+        <h2>{currTool}</h2>
         <div>
           <button onClick={this.handleUndo}>Undo</button>
           <button onClick={this.handleRedo}>Redo</button>
@@ -161,20 +210,48 @@ class NewProject extends Component {
             </Layer>
             <Layer>
               {!loading && (
-                <Line
-                  x={0}
-                  y={0}
-                  points={currLayer.formation}
-                  stroke="black"
-                />
+                <Line x={0} y={0} points={currLayer.formation} stroke="black" />
               )}
             </Layer>
+            <Layer>
+              {rectangels[0] &&
+                rectangels.map((rect, idx) => (
+                  <Rect
+                    draggable
+                    key={idx}
+                    x={rect.x}
+                    y={rect.y}
+                    width={rect.width}
+                    height={rect.height}
+                    fill="#eee"
+                    onDragStart={() => {
+                      this.setState({
+                        isDraggin: true,
+                      });
+                    }}
+                    onDragEnd={(e) => {
+                      this.setState({
+                        isDraggin: false,
+                        currElementCoords: { x: e.target.x(), y: e.target.y() },
+                      });
+                      this.updateRectangels(rect)
+                    }}
+                  />
+                ))}
+            </Layer>
+            
+            <CanvasGridLayer width={window.innerWidth - 250} hieght={window.innerHeight - 100}/>
+
+
           </Stage>
         </div>
 
-
-          <Modal showModal={showModal}/>
-        
+        <Modal
+          showModal={modal.showModal}
+          modalName={modal.modalTitle}
+          handleCloseModal={this.handleCloseModal}
+          createRect={this.createRect}
+        />
       </div>
     );
   }
