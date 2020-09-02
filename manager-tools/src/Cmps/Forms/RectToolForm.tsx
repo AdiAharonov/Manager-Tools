@@ -2,7 +2,7 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 
 
-interface ReactToolFormProps  {
+interface RectToolFormProps  {
     handleCloseModal: Function,
     createRect: Function
 }
@@ -15,7 +15,7 @@ interface Values {
 
 
 
-const Basic:React.FC<ReactToolFormProps > = ({ handleCloseModal, createRect }) => {
+const RectToolForm:React.FC<RectToolFormProps > = ({ handleCloseModal, createRect }) => {
 
     const initialValues: Values = {  width: 0, height: 0, name: 'Defualt Rect'  };
     const errors: { width: String} = {width: ''};
@@ -57,4 +57,4 @@ const Basic:React.FC<ReactToolFormProps > = ({ handleCloseModal, createRect }) =
   </div>
 )};
 
-export default Basic;
+export default RectToolForm;

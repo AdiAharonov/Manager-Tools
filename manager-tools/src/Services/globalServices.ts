@@ -34,23 +34,55 @@ const updateLayer = (id: number, formation: number[]) => {
 
 // Create & Handle Shapes
 
-const gRectangles: { name: String, width: number, height: number, x: number, y: number}[] = []
+const gRectangles: { id: number, name: String, width: number, height: number, x: number, y: number}[] = [];
+const gItems: { id: number, name: String, title: String, radiusInMeters: number, angle: number}[] = [];
+let gCanvasObjectId: number = 101
 
 const getRectangels = () => {
   return gRectangles;
 }
 
-const createRect = (name: string, width: number, height: number) => {
-    const newRect = {name, width, height, x: 50, y: 50};
+const createRect = ( name: string, width: number, height: number) => {
+    const newRect = {id: gCanvasObjectId++, name, width, height, x: 50, y: 50};
     gRectangles.push(newRect);
 }
 
-const updateRectangels = (rectangel: { name: String; width: number; height: number; x: number; y: number; }, currCoords: { x: number, y: number}) => {
+const updateRectangels = (rectangel: { id: number; name: String; width: number; height: number; x: number; y: number; }, currCoords: { x: number, y: number}) => {
   const currRectIdx = gRectangles.findIndex(rect => rect === rectangel);
-  const updatedRect: { name: String; width: number; height: number; x: number; y: number; } = { name: rectangel.name, width: rectangel.width, height: rectangel.height, x: currCoords.x, y: currCoords.y}
+  const updatedRect: { id: number; name: String; width: number; height: number; x: number; y: number; } = { id: rectangel.id, name: rectangel.name, width: rectangel.width, height: rectangel.height, x: currCoords.x, y: currCoords.y}
   gRectangles.splice(currRectIdx, 1);
   gRectangles.push(updatedRect);
   return gRectangles;
+}
+
+const getItems = () => {
+  return gItems;
+}
+
+const createItem = ( name: String, title: String, radiusInMeters: number, angle: number) => {
+  const newItem = { id: gCanvasObjectId++, name, title, radiusInMeters, angle };
+  gItems.push(newItem);
+}
+
+const findCanvasObj = (xPosition: number, yPosition: number) => {
+
+ let currCanvasObj: {id: number, name: String, width: number, height: number, x: number, y: number} = { id: 0, name: '', width: 0, height: 0, x: 0, y: 0};
+ 
+ gRectangles.forEach( rect => {
+  for ( let _i = rect.x; _i < (rect.width + rect.x); _i++) {
+    if (xPosition === _i) {
+       for( let _j = rect.y; _j < (rect.height + rect.y); _j++) {
+         if (yPosition === _j) {
+           currCanvasObj = rect
+         }
+       }
+    }
+
+  }
+  })
+
+  return currCanvasObj;
+  
 }
 
 export const globalService = {
@@ -59,6 +91,9 @@ export const globalService = {
   getGLayers,
   updateLayer,
   createRect,
+  getItems,
   getRectangels,
-  updateRectangels
+  updateRectangels,
+  createItem,
+  findCanvasObj
 };

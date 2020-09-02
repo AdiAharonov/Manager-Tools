@@ -5,20 +5,19 @@ import Konva from 'konva';
 interface CanvasGridLayerProps {
     width: number;
     hieght: number;
+    showGrid: boolean;
 }
 
-export const CanvasGridLayer: React.FC<CanvasGridLayerProps> = ({ width, hieght }) => {
+export const CanvasGridLayer: React.FC<CanvasGridLayerProps> = ({ width, hieght, showGrid }) => {
 
    const [grid, setGrid ] = useState<{w: number[][], h: number[][]}>({ w: [], h: []})
 
    useEffect(() => {
     createGrid(width, hieght); 
-  });
+  }, []);
 
 
    const createGrid = (w: number, h: number) => {
-
-    //    console.log(w, h)
 
     // width lines
         for (var _i = 0; _i < w; _i) {
@@ -37,8 +36,7 @@ export const CanvasGridLayer: React.FC<CanvasGridLayerProps> = ({ width, hieght 
     
   return (
   <Layer>
-      {grid.w[0] && grid.w.map((line, idx) =>  <Line key={idx}  x={0} y={0} points={line} stroke="#0010697d" strokeWidth={0.4} />)}
-      {grid.h[0] && grid.h.map((line, idx) =>  <Line key={idx}  x={0} y={0} points={line} stroke="#0010697d" strokeWidth={0.4} />)}
-      
+      { showGrid && grid.w[0] && grid.w.map((line, idx) =>  <Line key={idx}  x={0} y={0} points={line} stroke="#0010697d" strokeWidth={0.5} />)}
+      { showGrid && grid.h[0] && grid.h.map((line, idx) =>  <Line key={idx}  x={0} y={0} points={line} stroke="#0010697d" strokeWidth={0.5} />)}
   </Layer>
   )};
