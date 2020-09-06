@@ -1,5 +1,7 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
+import { globalService } from '../../Services/globalServices';
+
 
 interface UploadItemToolFormProps {
   handleCloseModal: Function;
@@ -26,6 +28,9 @@ const UploadItemTool: React.FC<UploadItemToolFormProps> = ({
         validate={(values) => {
           if (values.radiusInMeters <= 0) {
             errors.radius = 'Radius Required';
+          }else if (globalService.validateCanvasObjectName(values.name)){
+            values.name = values.name + '1'
+  
           } else {
             errors.radius = '';
           }

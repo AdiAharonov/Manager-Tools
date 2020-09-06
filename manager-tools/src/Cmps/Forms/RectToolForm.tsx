@@ -1,6 +1,6 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
-
+import { globalService } from '../../Services/globalServices';
 
 interface RectToolFormProps  {
     handleCloseModal: Function,
@@ -29,6 +29,9 @@ const RectToolForm:React.FC<RectToolFormProps > = ({ handleCloseModal, createRec
         if (values.width <= 0 || values.height <= 0) {
           errors.width = 'Width And Height Required';
           
+        } else if (globalService.validateCanvasObjectName(values.name)){
+          values.name = values.name + '1'
+
         } else {
             errors.width = '';
         } 

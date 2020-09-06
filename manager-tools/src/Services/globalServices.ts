@@ -35,7 +35,7 @@ const updateLayer = (id: number, formation: number[]) => {
 // Create & Handle Shapes
 
 const gRectangles: { id: number, name: String, width: number, height: number, x: number, y: number}[] = [];
-const gItems: { id: number, name: String, title: String, radiusInMeters: number, angle: number}[] = [];
+const gItems: { id: number, name: String, title: String, radiusInMeters: number, angle: number, x: number, y: number, endPoints?: { x1: number, y1: number, x2: number, y2: number}}[] = [];
 let gCanvasObjectId: number = 101
 
 const getRectangels = () => {
@@ -55,25 +55,36 @@ const updateRectangels = (rectangel: { id: number; name: String; width: number; 
   return gRectangles;
 }
 
+
+
 const getItems = () => {
   return gItems;
 }
 
+const updateItems = (currItem: { id: number;name: String, title: String, radiusInMeters: number, angle: number, x: number, y: number }, currCoords: { x: number, y: number}) => {
+  const currItemIdx = gItems.findIndex(item => item.id === currItem.id);
+  const updatedItem: { id: number;name: String, title: String, radiusInMeters: number, angle: number, x: number, y: number } = { id: currItem.id, name: currItem.name, title: currItem.title, radiusInMeters: currItem.radiusInMeters, angle: currItem.angle, x: currCoords.x, y: currCoords.y};
+  console.log(updatedItem.x, updatedItem.y)
+  gItems.splice(currItemIdx, 1);
+  gItems.push(updatedItem);
+  return gItems;
+}
+
 const createItem = ( name: String, title: String, radiusInMeters: number, angle: number) => {
-  const newItem = { id: gCanvasObjectId++, name, title, radiusInMeters, angle };
+  const newItem = { id: gCanvasObjectId++, name, title, radiusInMeters, angle, x: 20, y: 20 };
   gItems.push(newItem);
 }
 
 const findCanvasObj = (xPosition: number, yPosition: number) => {
 
- let currCanvasObj: {id: number, name: String, width: number, height: number, x: number, y: number} = { id: 0, name: '', width: 0, height: 0, x: 0, y: 0};
+ let currCanvasObj: {id: number, name: String, width?: number, height?: number, radiusInMeters?: number, angle?: number, x: number, y: number} = { id: 0, name: '', x: 0, y: 0};
  
  gRectangles.forEach( rect => {
   for ( let _i = rect.x; _i < (rect.width + rect.x); _i++) {
     if (xPosition === _i) {
        for( let _j = rect.y; _j < (rect.height + rect.y); _j++) {
          if (yPosition === _j) {
-           currCanvasObj = rect
+           currCanvasObj = rect;
          }
        }
     }
@@ -81,8 +92,23 @@ const findCanvasObj = (xPosition: number, yPosition: number) => {
   }
   })
 
+  if (currCanvasObj.id !== 0) return currCanvasObj;
+
+  gItems.forEach( item => {
+
+    const d = Math.hypot(item.x - xPosition, item.y - yPosition);
+    if (d <= item.radiusInMeters) currCanvasObj = item;
+  
+    })
+
   return currCanvasObj;
   
+}
+
+const validateCanvasObjectName = (name: String) => {
+ if (gRectangles.find((rect) => rect.name === name)) return true
+ if (gItems.find((item) => item.name === name)) return true;
+ 
 }
 
 export const globalService = {
@@ -95,5 +121,7 @@ export const globalService = {
   getRectangels,
   updateRectangels,
   createItem,
-  findCanvasObj
+  findCanvasObj,
+  updateItems,
+  validateCanvasObjectName
 };

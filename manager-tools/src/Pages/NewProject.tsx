@@ -1,11 +1,22 @@
 import React, { Component, MouseEvent } from 'react';
 import { ToolBar } from '../Cmps/ToolBar';
-import { Stage, Layer, Image, Line, Rect,Transformer,  Circle, Shape } from 'react-konva';
+import {
+  Stage,
+  Layer,
+  Image,
+  Line,
+  Rect,
+  Transformer,
+  Circle,
+  Shape,
+} from 'react-konva';
 import Konva from 'konva';
 import useImage from 'use-image';
 import { globalService } from '../Services/globalServices';
 import { Modal } from '../Cmps/Modal';
 import { CanvasGridLayer } from '../Cmps/CanvasGridLayer';
+
+// BackGround image for the canvas cmp
 
 const BgImage: React.FC<{ url: string }> = ({ url }) => {
   const [image] = useImage(url);
@@ -37,7 +48,15 @@ interface State {
   isDraggin: boolean;
   currElementCoords: { x: number; y: number };
   showGrid: boolean;
-  items: { name: String, title: String, radiusInMeters: number, angle: number }[];
+  items: {
+    id: number;
+    name: String;
+    title: String;
+    radiusInMeters: number;
+    angle: number;
+    x: number;
+    y: number;
+  }[];
   selectedShapeName: String;
 }
 
@@ -55,7 +74,7 @@ class NewProject extends Component {
     currElementCoords: { x: 0, y: 0 },
     showGrid: true,
     items: [],
-    selectedShapeName: ''
+    selectedShapeName: '',
   };
 
   componentDidMount() {
@@ -69,7 +88,7 @@ class NewProject extends Component {
 
   componentDidUpdate(prevState: State) {
     if (prevState.items !== this.state.items) {
-      console.log(this.state.items);
+      // console.log(this.state.items);
     }
   }
 
@@ -123,22 +142,20 @@ class NewProject extends Component {
   };
 
   handleGrid = () => {
-    this.setState({ showGrid: !this.state.showGrid});
-  }
+    this.setState({ showGrid: !this.state.showGrid });
+  };
 
-// Mouse Events
+  // Mouse Events
 
   handleMouseDown = (ev: Konva.KonvaEventObject<MouseEvent>) => {
-    
     // Current X,Y canvas click position
     // Problem - ev.evt.offsetX dosent work, meanwhile i use pageX
     const xPosition = ev.evt.pageX - 250;
     const yPosition = ev.evt.pageY - 50;
 
-     // Draw tool
+    // Draw tool
     // Handle Pen Formation Drawing
     if (this.state.currTool === 'pen') {
-
       this.setState({
         formation: [...this.state.formation, xPosition, yPosition],
         currLayer: {
@@ -147,30 +164,71 @@ class NewProject extends Component {
         },
       });
     }
-    
+
     // Handle Select/Deslect Canvas Object
-    
-    const selectedCanvasObj = globalService.findCanvasObj(xPosition, yPosition)
-    this.setState({ selectedShapeName: selectedCanvasObj.name})
+
+    const selectedCanvasObj = globalService.findCanvasObj(xPosition, yPosition);
+    this.setState({ selectedShapeName: selectedCanvasObj.name });
+    // console.log(selectedCanvasObj)
   };
 
   // Shapes
-
 
   createRect = (name: string, width: number, height: number) => {
     globalService.createRect(name, width, height);
     this.setState({ rectangels: globalService.getRectangels() });
   };
 
-  updateRectangels = (rect: { id: number; name: String; width: number; height: number; x: number; y: number; }) => {
-    const updatedRectangels: { id: number; name: String; width: number; height: number; x: number; y: number; }[] = globalService.updateRectangels(rect, this.state.currElementCoords);
-    this.setState({ rectangels: updatedRectangels })
+  updateRectangels = (rect: {
+    id: number;
+    name: String;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+  }) => {
+    const updatedRectangels: {
+      id: number;
+      name: String;
+      width: number;
+      height: number;
+      x: number;
+      y: number;
+    }[] = globalService.updateRectangels(rect, this.state.currElementCoords);
+    this.setState({ rectangels: updatedRectangels });
   };
 
-  createItem = ( name: String, title: String, radiusInMeters: number, angle: number ) => {
+  createItem = (
+    name: String,
+    title: String,
+    radiusInMeters: number,
+    angle: number
+  ) => {
     globalService.createItem(name, title, radiusInMeters, angle);
     this.setState({ items: globalService.getItems() });
-  }
+  };
+
+  updateItems = (item: {
+    id: number;
+    name: String;
+    title: String;
+    radiusInMeters: number;
+    angle: number;
+    x: number;
+    y: number;
+  }) => {
+    console.log(this.state.currElementCoords);
+    const updatedItems: {
+      id: number;
+      name: String;
+      title: String;
+      radiusInMeters: number;
+      angle: number;
+      x: number;
+      y: number;
+    }[] = globalService.updateItems(item, this.state.currElementCoords);
+    this.setState({ items: updatedItems });
+  };
 
   // Modal
 
@@ -201,7 +259,8 @@ class NewProject extends Component {
       isDraggin,
       showGrid,
       items,
-      selectedShapeName
+      selectedShapeName,
+      currElementCoords,
     } = this.state;
 
     return (
@@ -212,13 +271,15 @@ class NewProject extends Component {
           handleOpenModal={this.handleOpenModal}
         />
 
-        <h2>{currTool}</h2>
-        <h2>{selectedShapeName}</h2>
+        {/* <h2>{currTool}</h2> */}
+        {/* <h2>{selectedShapeName}</h2> */}
         <div>
           <button onClick={this.handleUndo}>Undo</button>
           <button onClick={this.handleRedo}>Redo</button>
           <button onClick={this.addLayer}>Add Layer</button>
-          <button onClick={this.handleGrid}>{showGrid ? 'Hide' : 'Show'} Grid</button>
+          <button onClick={this.handleGrid}>
+            {showGrid ? 'Hide' : 'Show'} Grid
+          </button>
           {layers[0] &&
             layers.map((layer, idx) => (
               <button
@@ -237,12 +298,15 @@ class NewProject extends Component {
             width={window.innerWidth - 250}
             height={window.innerHeight - 100}
             onContentMousedown={this.handleMouseDown}
-            
           >
             <Layer>
               <BgImage url={img} />
             </Layer>
-            <CanvasGridLayer width={window.innerWidth - 250} hieght={window.innerHeight - 100} showGrid={showGrid}/>
+            <CanvasGridLayer
+              width={window.innerWidth - 250}
+              hieght={window.innerHeight - 100}
+              showGrid={showGrid}
+            />
             <Layer>
               {!loading && (
                 <Line x={0} y={0} points={currLayer.formation} stroke="black" />
@@ -251,17 +315,18 @@ class NewProject extends Component {
             <Layer>
               {rectangels[0] &&
                 rectangels.map((rect, idx) => (
-        
                   <Rect
-                   shapeProps={rect}
-                   isSelected={rect.name === selectedShapeName}
+                    shapeProps={rect}
+                    isSelected={rect.name === selectedShapeName}
                     draggable
                     key={idx}
                     x={rect.x}
                     y={rect.y}
                     width={rect.width}
                     height={rect.height}
-                    stroke={ selectedShapeName === rect.name ? 'yellow' : ''}
+                    stroke={
+                      selectedShapeName === rect.name ? 'yellow' : 'black'
+                    }
                     fill="#eee"
                     onDragStart={() => {
                       this.setState({
@@ -273,65 +338,89 @@ class NewProject extends Component {
                         isDraggin: false,
                         currElementCoords: { x: e.target.x(), y: e.target.y() },
                       });
-                      this.updateRectangels(rect)
+                      this.updateRectangels(rect);
                     }}
                     onSelect={() => {
                       this.setState({ selectedShapeName: rect.name });
                     }}
                   />
-                 
                 ))}
             </Layer>
             <Layer>
-              { items[0] &&
-                  items.map(( item, idx ) => ( !item.angle ? 
-                   <Circle
-                    x={100}
-                    y={100}
-                    draggable
-                    radius={item.radiusInMeters}
-                    fill="green"
-                    key={idx}
-                    onDragStart={() => {
-                      this.setState({
-                        isDraggin: true,
-                      });
-                    }}
-                    onDragEnd={(e) => {
-                      this.setState({
-                        isDraggin: false,
-                        currElementCoords: { x: e.target.x(), y: e.target.y() },
-                      });
-                      
-                    }}
-                  />
-
-                  :
-
-                  <Shape
-                  key={idx}
-          sceneFunc={(context, shape) => {
-            context.beginPath();
-            context.moveTo(100, 100);
-            context.lineTo(100 + item.radiusInMeters, 100);;
-            context.arc(100, 100, item.radiusInMeters, 0, item.angle * Math.PI / 180, false)
-            context.closePath();
-            context.fillStrokeShape(shape);
-          }}
-          fill="#00D2FF"
-          stroke="black"
-          strokeWidth={1}
-          draggable
-        />
-
-                  ))}
+              {items[0] &&
+                items.map((item, idx) =>
+                  !item.angle ? (
+                    <Circle
+                      x={item.x}
+                      y={item.y}
+                      draggable
+                      radius={item.radiusInMeters}
+                      stroke={
+                        selectedShapeName === item.name ? 'yellow' : 'black'
+                      }
+                      fill="green"
+                      key={idx}
+                      onDragStart={() => {
+                        this.setState({
+                          isDraggin: true,
+                        });
+                      }}
+                      onDragEnd={(e) => {
+                        this.setState({
+                          isDraggin: false,
+                          currElementCoords: {
+                            x: e.target.x(),
+                            y: e.target.y(),
+                          },
+                        });
+                        this.updateItems(item);
+                      }}
+                    />
+                  ) : (
+                    <Shape
+                      key={idx}
+                      x={item.x}
+                      y={item.y}
+                      sceneFunc={(context, shape) => {
+                        context.beginPath();
+                        context.moveTo(0, 0);
+                        context.lineTo(item.radiusInMeters, 0);
+                        context.arc(
+                          0,
+                          0,
+                          item.radiusInMeters,
+                          0,
+                          (item.angle * Math.PI) / 180,
+                          false
+                        );
+                        context.closePath();
+                        context.fillStrokeShape(shape);
+                      }}
+                      fill="#00D2FF"
+                      stroke={
+                        selectedShapeName === item.name ? 'yellow' : 'black'
+                      }
+                      strokeWidth={1}
+                      draggable
+                      onDragStart={() => {
+                        this.setState({
+                          isDraggin: true,
+                        });
+                      }}
+                      onDragEnd={(e) => {
+                        this.setState({
+                          isDraggin: false,
+                          currElementCoords: {
+                            x: e.target.x(),
+                            y: e.target.y(),
+                          },
+                        });
+                        this.updateItems(item);
+                      }}
+                    />
+                  )
+                )}
             </Layer>
-            
-           
-
-        
-            
-
           </Stage>
         </div>
 
