@@ -1,0 +1,23 @@
+.layers-bar {
+    position: absolute;
+    background-color: darken($clr1, 7);
+    border-left: solid 2px darken($clr1, 10);
+    height: 100%;
+    width: 200px;
+    z-index: 9999;
+    top: 60px;
+    right: 0;
+
+    h3 {
+        color: #fff;
+        width: 100%;
+        text-align: center;
+        background-color: rgba(194, 194, 194, 0.199);
+
+    }
+    .layer {
+        background-color: $clr3;
+        border: none;
+        color: #fff;
+    }
+}

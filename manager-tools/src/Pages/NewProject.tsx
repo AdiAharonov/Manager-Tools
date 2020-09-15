@@ -15,6 +15,8 @@ import useImage from 'use-image';
 import { globalService } from '../Services/globalServices';
 import { Modal } from '../Cmps/Modal';
 import { CanvasGridLayer } from '../Cmps/CanvasGridLayer';
+import { LayersBar } from '../Cmps/LayersBar';
+import { CanvasOptions } from '../Cmps/CanvasOptions';
 import {
   RectInterface,
   LayerInterface,
@@ -271,39 +273,23 @@ class NewProject extends Component {
 
         {/* <h2>{currTool}</h2> */}
         {/* <h2>{selectedShapeName}</h2> */}
-        <h2>{itemRotaionDeg}</h2>
-        <div>
-          <button onClick={this.handleUndo}>Undo</button>
-          <button onClick={this.handleRedo}>Redo</button>
-          <button onClick={this.addLayer}>Add Layer</button>
-          <button
-            onMouseDown={this.handleItemRotaionClockwise}
-            onMouseUp={this.handleItemRotaionClockwise}
-          >
-            Rotate Clockwise
-          </button>
-          <button
-            onMouseDown={this.handleItemRotaionCounterClockwise}
-            onMouseUp={this.handleItemRotaionCounterClockwise}
-          >
-            Rotate Counter Clockwise
-          </button>
+        {/* <h2>{itemRotaionDeg}</h2> */}
+        
+        <CanvasOptions 
+        addLayer={this.addLayer}
+        handleUndo={this.handleUndo}
+        handleRedo={this.handleRedo}
+        
+        handleGrid={this.handleGrid}
+        handleItemRotaionClockwise={this.handleItemRotaionClockwise}
+        handleItemRotaionCounterClockwise={this.handleItemRotaionCounterClockwise}
+        showGrid={showGrid}
+        />
 
-          <button onClick={this.handleGrid}>
-            {showGrid ? 'Hide' : 'Show'} Grid
-          </button>
-          {layers[0] &&
-            layers.map((layer, idx) => (
-              <button
-                key={idx}
-                id={idx.toString()}
-                className={layer.name}
-                onClick={this.selectLayer}
-              >
-                {layer.name}
-              </button>
-            ))}
-        </div>
+        <LayersBar
+        layers={layers}
+        selectLayer={this.selectLayer}
+        />
 
         <div className="canvas-area">
           <Stage
