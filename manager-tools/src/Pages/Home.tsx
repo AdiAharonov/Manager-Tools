@@ -1,36 +1,44 @@
-import * as React from "react";
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { globalService } from '../Services/globalServices';
-
-export interface HomeProps {
-    
-}
+import logo from '../assets/images/logo.png';
+import logoName from '../assets/images/logo-name.png';
+export interface HomeProps {}
 
 interface Categorie {
-    name: string,
-    link: string
+  name: string;
+  link: string;
 }
 
+export const Home: React.FC<HomeProps> = () => {
+  const [categories, setCategories] = React.useState<Categorie[]>([]);
 
-export const Home:React.FC<HomeProps> = () => {
+  React.useEffect(() => {
+    const currCategories = globalService.getCategories();
+    console.log(currCategories);
+    setCategories(currCategories);
+  }, []);
 
-    const [categories, setCategories] = React.useState<Categorie[]>([]);
+  return (
+    <div className="home main-container">
+      <div className="logo-container">
+        <img className="logo" src={logo} alt={logoName} />
+        <img className="logo-name" src={logoName} alt="" />
+      </div>
+      <div className="greeting">
+        <h2>Welcome!</h2>
+        <h3>What's the plan for today:</h3>
+      </div>
 
-    React.useEffect(() => {
-        const currCategories = globalService.getCategories();
-        console.log(currCategories)
-        setCategories(currCategories);
-      }, [])
-    
-
-    
-        return (
-            <div className="home">
-                <h1>MANAGER TOOLS</h1>
-                {categories && <div className="categories">
-                    {categories.map((categorie, idx) => <Link to={categorie.link} key={idx}><div className="categorie">{categorie.name}</div></Link>) }
-                </div>}
-            </div>
-        )
-    
-}
+      {categories && (
+        <div className="categories">
+          {categories.map((categorie, idx) => (
+            <Link to={categorie.link} key={idx}>
+              <div className="categorie">{categorie.name}</div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

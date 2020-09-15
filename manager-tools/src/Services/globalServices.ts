@@ -1,8 +1,6 @@
 const gCategories: { name: string; link: string }[] = [
   { name: 'New Project', link: '/newproject' },
-  { name: 'My Project', link: '/' },
-  { name: 'Blank1', link: '/' },
-  { name: 'Blank2', link: '/' },
+  { name: 'My Projects', link: '/' },
 ];
 
 const getCategories = () => {
@@ -35,7 +33,7 @@ const updateLayer = (id: number, formation: number[]) => {
 // Create & Handle Shapes
 
 const gRectangles: { id: number, name: String, width: number, height: number, x: number, y: number}[] = [];
-const gItems: { id: number, name: String, title: String, radiusInMeters: number, angle: number, x: number, y: number, endPoints?: { x1: number, y1: number, x2: number, y2: number}}[] = [];
+const gItems: { id: number, name: String, title: string, radiusInMeters: number, angle: number, x: number, y: number, endPoints?: { x1: number, y1: number, x2: number, y2: number}}[] = [];
 let gCanvasObjectId: number = 101
 
 const getRectangels = () => {
@@ -61,17 +59,17 @@ const getItems = () => {
   return gItems;
 }
 
-const updateItems = (currItem: { id: number;name: String, title: String, radiusInMeters: number, angle: number, x: number, y: number }, currCoords: { x: number, y: number}) => {
+const updateItems = (currItem: { id: number;name: String, title: string, radiusInMeters: number, angle: number, x: number, y: number }, currCoords: { x: number, y: number}) => {
   const currItemIdx = gItems.findIndex(item => item.id === currItem.id);
-  const updatedItem: { id: number;name: String, title: String, radiusInMeters: number, angle: number, x: number, y: number } = { id: currItem.id, name: currItem.name, title: currItem.title, radiusInMeters: currItem.radiusInMeters, angle: currItem.angle, x: currCoords.x, y: currCoords.y};
+  const updatedItem: { id: number;name: String, title: string, radiusInMeters: number, angle: number, x: number, y: number } = { id: currItem.id, name: currItem.name, title: currItem.title, radiusInMeters: currItem.radiusInMeters, angle: currItem.angle, x: currCoords.x, y: currCoords.y};
   console.log(updatedItem.x, updatedItem.y)
   gItems.splice(currItemIdx, 1);
   gItems.push(updatedItem);
   return gItems;
 }
 
-const createItem = ( name: String, title: String, radiusInMeters: number, angle: number) => {
-  const newItem = { id: gCanvasObjectId++, name, title, radiusInMeters, angle, x: 20, y: 20 };
+const createItem = ( name: String, title: string, radiusInMeters: number, angle: number) => {
+  const newItem = { id: gCanvasObjectId++, name, title, radiusInMeters, angle, x: 40, y: 40 };
   gItems.push(newItem);
 }
 

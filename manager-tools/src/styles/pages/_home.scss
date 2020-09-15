@@ -1,20 +1,82 @@
 .home {
-  background-color: rgb(190, 231, 231);
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('../../assets/images/landing-page.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  .logo {
+    width: 120px;
+    position: absolute;
+    top: 20px;
+    left: 60px;
+  }
+
+  .logo-name {
+    width: 220px;
+    position: absolute;
+    top: 80px;
+    left: 190px;
+  }
+
+  
+
+  .greeting {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-family: solway-bold;
+    color: $clr4;
+  }
 
   .categories {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    grid-column-gap: 5px;
-    grid-row-gap: 5px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+
+    a {text-decoration: none;}
 
     .categorie {
-        border: rgb(83, 110, 110) solid 2px;
-        padding: 15px;
-        margin: 15px;
+        font-family: solway-reg;
+        width: 100%;
+        font-size: rem(24px);
         cursor: pointer;
+        color: $clr4;
+        margin: 10px 0;
+        transition: all ease-in-out .4s;
+      
+
+      }
+      .categorie:hover {
+        transform: translateX(20px);
+        color: lighten($clr4, 10);
+    } 
+  }
+
+  @include for-mobile-layout {
+    text-align: center;
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+
+      .logo {
+        position: static;
+      }
+      .logo-name {
+        position: static;
+      }
+
     }
+        .greeting {
+          
+          justify-content: center;
+          align-items: center;
+          
+        }
   }
 }

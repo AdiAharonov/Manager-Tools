@@ -6,15 +6,20 @@ import {
   Image,
   Line,
   Rect,
-  Transformer,
   Circle,
   Shape,
+  Text,
 } from 'react-konva';
 import Konva from 'konva';
 import useImage from 'use-image';
 import { globalService } from '../Services/globalServices';
 import { Modal } from '../Cmps/Modal';
 import { CanvasGridLayer } from '../Cmps/CanvasGridLayer';
+import {
+  RectInterface,
+  LayerInterface,
+  ItemInterface,
+} from '../Services/interfaceService';
 
 // BackGround image for the canvas cmp
 
@@ -33,31 +38,18 @@ interface State {
   img: string;
   currTool: string;
   formation: number[];
-  currLayer: { id: number; name: string; formation: number[] };
-  layers: { id: number; name: string; formation: number[] }[];
+  currLayer: LayerInterface;
+  layers: LayerInterface[];
   loading: boolean;
   modal: { showModal: boolean; modalTitle: string };
-  rectangels: {
-    id: number;
-    name: String;
-    width: number;
-    height: number;
-    x: number;
-    y: number;
-  }[];
+  rectangels: RectInterface[];
   isDraggin: boolean;
   currElementCoords: { x: number; y: number };
   showGrid: boolean;
-  items: {
-    id: number;
-    name: String;
-    title: String;
-    radiusInMeters: number;
-    angle: number;
-    x: number;
-    y: number;
-  }[];
+  items: ItemInterface[];
   selectedShapeName: String;
+  itemRotaionDeg: number;
+  intervalId: NodeJS.Timeout;
 }
 
 class NewProject extends Component {
@@ -75,6 +67,8 @@ class NewProject extends Component {
     showGrid: true,
     items: [],
     selectedShapeName: '',
+    itemRotaionDeg: 0,
+    intervalId: setInterval(() => {}, 100),
   };
 
   componentDidMount() {
@@ -145,6 +139,33 @@ class NewProject extends Component {
     this.setState({ showGrid: !this.state.showGrid });
   };
 
+  handleItemRotaionClockwise = (e: MouseEvent) => {
+    e.preventDefault();
+
+    if (e.type === 'mousedown') {
+      const rotation: NodeJS.Timeout = setInterval(() => {
+        this.setState({ itemRotaionDeg: this.state.itemRotaionDeg - 1 });
+      }, 50);
+      this.setState({ intervalId: rotation });
+    }
+    if (e.type === 'mouseup') {
+      clearInterval(this.state.intervalId);
+    }
+  };
+  handleItemRotaionCounterClockwise = (e: MouseEvent) => {
+    e.preventDefault();
+
+    if (e.type === 'mousedown') {
+      const rotation: NodeJS.Timeout = setInterval(() => {
+        this.setState({ itemRotaionDeg: this.state.itemRotaionDeg + 1 });
+      }, 50);
+      this.setState({ intervalId: rotation });
+    }
+    if (e.type === 'mouseup') {
+      clearInterval(this.state.intervalId);
+    }
+  };
+
   // Mouse Events
 
   handleMouseDown = (ev: Konva.KonvaEventObject<MouseEvent>) => {
@@ -179,28 +200,17 @@ class NewProject extends Component {
     this.setState({ rectangels: globalService.getRectangels() });
   };
 
-  updateRectangels = (rect: {
-    id: number;
-    name: String;
-    width: number;
-    height: number;
-    x: number;
-    y: number;
-  }) => {
-    const updatedRectangels: {
-      id: number;
-      name: String;
-      width: number;
-      height: number;
-      x: number;
-      y: number;
-    }[] = globalService.updateRectangels(rect, this.state.currElementCoords);
+  updateRectangels = (rect: RectInterface) => {
+    const updatedRectangels: RectInterface[] = globalService.updateRectangels(
+      rect,
+      this.state.currElementCoords
+    );
     this.setState({ rectangels: updatedRectangels });
   };
 
   createItem = (
     name: String,
-    title: String,
+    title: string,
     radiusInMeters: number,
     angle: number
   ) => {
@@ -208,25 +218,12 @@ class NewProject extends Component {
     this.setState({ items: globalService.getItems() });
   };
 
-  updateItems = (item: {
-    id: number;
-    name: String;
-    title: String;
-    radiusInMeters: number;
-    angle: number;
-    x: number;
-    y: number;
-  }) => {
+  updateItems = (item: ItemInterface) => {
     console.log(this.state.currElementCoords);
-    const updatedItems: {
-      id: number;
-      name: String;
-      title: String;
-      radiusInMeters: number;
-      angle: number;
-      x: number;
-      y: number;
-    }[] = globalService.updateItems(item, this.state.currElementCoords);
+    const updatedItems: ItemInterface[] = globalService.updateItems(
+      item,
+      this.state.currElementCoords
+    );
     this.setState({ items: updatedItems });
   };
 
@@ -261,6 +258,7 @@ class NewProject extends Component {
       items,
       selectedShapeName,
       currElementCoords,
+      itemRotaionDeg,
     } = this.state;
 
     return (
@@ -273,10 +271,24 @@ class NewProject extends Component {
 
         {/* <h2>{currTool}</h2> */}
         {/* <h2>{selectedShapeName}</h2> */}
+        <h2>{itemRotaionDeg}</h2>
         <div>
           <button onClick={this.handleUndo}>Undo</button>
           <button onClick={this.handleRedo}>Redo</button>
           <button onClick={this.addLayer}>Add Layer</button>
+          <button
+            onMouseDown={this.handleItemRotaionClockwise}
+            onMouseUp={this.handleItemRotaionClockwise}
+          >
+            Rotate Clockwise
+          </button>
+          <button
+            onMouseDown={this.handleItemRotaionCounterClockwise}
+            onMouseUp={this.handleItemRotaionCounterClockwise}
+          >
+            Rotate Counter Clockwise
+          </button>
+
           <button onClick={this.handleGrid}>
             {showGrid ? 'Hide' : 'Show'} Grid
           </button>
@@ -350,74 +362,112 @@ class NewProject extends Component {
               {items[0] &&
                 items.map((item, idx) =>
                   !item.angle ? (
-                    <Circle
-                      x={item.x}
-                      y={item.y}
-                      draggable
-                      radius={item.radiusInMeters}
-                      stroke={
-                        selectedShapeName === item.name ? 'yellow' : 'black'
-                      }
-                      fill="green"
-                      key={idx}
-                      onDragStart={() => {
-                        this.setState({
-                          isDraggin: true,
-                        });
-                      }}
-                      onDragEnd={(e) => {
-                        this.setState({
-                          isDraggin: false,
-                          currElementCoords: {
-                            x: e.target.x(),
-                            y: e.target.y(),
-                          },
-                        });
-                        this.updateItems(item);
-                      }}
-                    />
+                    <>
+                      <Circle
+                        x={item.x}
+                        y={item.y}
+                        draggable
+                        radius={item.radiusInMeters}
+                        stroke={
+                          selectedShapeName === item.name ? 'yellow' : 'black'
+                        }
+                        fill="green"
+                        key={idx}
+                        onDragStart={() => {
+                          this.setState({
+                            isDraggin: true,
+                          });
+                        }}
+                        onDragEnd={(e) => {
+                          this.setState({
+                            isDraggin: false,
+                            currElementCoords: {
+                              x: e.target.x(),
+                              y: e.target.y(),
+                            },
+                          });
+                          this.updateItems(item);
+                        }}
+                      />
+
+                      <Text
+                        x={item.x + item.radiusInMeters + 10}
+                        y={item.y}
+                        fill={
+                          selectedShapeName === item.name ? 'yellow' : 'black'
+                        }
+                        text={item.title}
+                        fontSize={16}
+                      />
+                    </>
                   ) : (
-                    <Shape
-                      key={idx}
-                      x={item.x}
-                      y={item.y}
-                      sceneFunc={(context, shape) => {
-                        context.beginPath();
-                        context.moveTo(0, 0);
-                        context.lineTo(item.radiusInMeters, 0);
-                        context.arc(
-                          0,
-                          0,
-                          item.radiusInMeters,
-                          0,
-                          (item.angle * Math.PI) / 180,
-                          false
-                        );
-                        context.closePath();
-                        context.fillStrokeShape(shape);
-                      }}
-                      fill="#00D2FF"
-                      stroke={
-                        selectedShapeName === item.name ? 'yellow' : 'black'
-                      }
-                      strokeWidth={1}
-                      draggable
-                      onDragStart={() => {
-                        this.setState({
-                          isDraggin: true,
-                        });
-                      }}
-                      onDragEnd={(e) => {
-                        this.setState({
-                          isDraggin: false,
-                          currElementCoords: {
-                            x: e.target.x(),
-                            y: e.target.y(),
-                          },
-                        });
-                        this.updateItems(item);
-                      }}
-                    />
+                    <>
+                      <Shape
+                        key={idx}
+                        x={item.x}
+                        y={item.y}
+                        sceneFunc={(context, shape) => {
+                          context.beginPath();
+                          context.moveTo(0, 0);
+                          context.lineTo(
+                            item.radiusInMeters *
+                              Math.cos(itemRotaionDeg * 0.0174532925),
+                            item.radiusInMeters *
+                              Math.sin(-itemRotaionDeg * 0.0174532925)
+                          );
+                          context.arc(
+                            0,
+                            0,
+                            item.radiusInMeters,
+                            ((360 - itemRotaionDeg) / 180) * Math.PI,
+                            ((item.angle - itemRotaionDeg) / 180) * Math.PI,
+                            false
+                          );
+                          context.closePath();
+                          context.fillStrokeShape(shape);
+                        }}
+                        fill="#00D2FF"
+                        stroke={
+                          selectedShapeName === item.name ? 'yellow' : 'black'
+                        }
+                        strokeWidth={1}
+                        draggable
+                        onDragStart={() => {
+                          this.setState({
+                            isDraggin: true,
+                          });
+                        }}
+                        onDragEnd={(e) => {
+                          this.setState({
+                            isDraggin: false,
+                            currElementCoords: {
+                              x: e.target.x(),
+                              y: e.target.y(),
+                            },
+                          });
+                          this.updateItems(item);
+                        }}
+                      />
+
+                      <Text
+                        x={item.x + item.radiusInMeters + 10}
+                        y={item.y}
+                        fill={
+                          selectedShapeName === item.name ? 'yellow' : 'black'
+                        }
+                        text={item.title}
+                        fontSize={16}
+                      />
+                      <Text
+                        x={item.x + item.radiusInMeters + 10}
+                        y={item.y + 30}
+                        fill={
+                          selectedShapeName === item.name ? 'yellow' : 'black'
+                        }
+                        text={item.angle.toString() + ' Deg'}
+                        fontSize={16}
+                      />
+                    </>
                   )
                 )}
             </Layer>
