@@ -1,6 +1,6 @@
 export interface RectInterface {
   id: number;
-  name: String;
+  name: string;
   width: number;
   height: number;
   x: number;
@@ -11,6 +11,7 @@ export interface LayerInterface {
   id: number;
   name: string;
   formation: number[];
+  show: boolean;
 }
 
 export interface ItemInterface {

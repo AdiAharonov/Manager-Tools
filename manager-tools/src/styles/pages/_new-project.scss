@@ -2,6 +2,7 @@
     display: flex;
     height: 100vh;
     background-color: rgb(146, 143, 143);
+    overflow: hidden;
 
     .canvas-options {
         background-color: lighten($clr1, 10);
@@ -18,9 +19,11 @@
     }
 
     .canvas-area {
-        margin: auto;
+        position: absolute;
+        top: 60px;
+        right: 0;
         border-radius: 2px;
-        border: 1px solid grey;
+        border: 1px solid rgb(34, 33, 33);
     }
     
 }

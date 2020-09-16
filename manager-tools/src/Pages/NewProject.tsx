@@ -52,6 +52,7 @@ interface State {
   selectedShapeName: String;
   itemRotaionDeg: number;
   intervalId: NodeJS.Timeout;
+  showLayersBar: boolean;
 }
 
 class NewProject extends Component {
@@ -59,7 +60,7 @@ class NewProject extends Component {
     img: '',
     currTool: '',
     formation: [],
-    currLayer: { id: 101, name: 'Default Layer', formation: [] },
+    currLayer: { id: 101, name: 'Default Layer', formation: [20, 50, 100, 100, 300, 300], show: true },
     layers: [],
     loading: true,
     modal: { showModal: false, modalTitle: 'Default' },
@@ -71,6 +72,7 @@ class NewProject extends Component {
     selectedShapeName: '',
     itemRotaionDeg: 0,
     intervalId: setInterval(() => {}, 100),
+    showLayersBar: false
   };
 
   componentDidMount() {
@@ -83,8 +85,9 @@ class NewProject extends Component {
   }
 
   componentDidUpdate(prevState: State) {
-    if (prevState.items !== this.state.items) {
-      // console.log(this.state.items);
+    if (prevState.currTool !== this.state.currTool) {
+
+      
     }
   }
 
@@ -97,6 +100,15 @@ class NewProject extends Component {
   setCurrTool = (toolName: string) => {
     this.setState({ currTool: toolName });
     this.handleOpenModal(toolName);
+    if (toolName === 'layers') {
+      this.setState({
+        showLayersBar: true
+      })
+    } else {
+      this.setState({
+        showLayersBar: false
+      })
+    }
   };
 
   // Canvas options
@@ -137,6 +149,15 @@ class NewProject extends Component {
     });
   };
 
+  handleShowLayer = (layer: LayerInterface) => {
+    layer.show = !layer.show;
+    globalService.handleShowLayer(layer.id, layer.show);
+    const updatedLayers = globalService.getGLayers();
+    this.setState({
+      layers: updatedLayers
+    })
+  }
+
   handleGrid = () => {
     this.setState({ showGrid: !this.state.showGrid });
   };
@@ -168,14 +189,14 @@ class NewProject extends Component {
     }
   };
 
-  // Mouse Events
+  // Mouse Events (every click on canvas)
 
   handleMouseDown = (ev: Konva.KonvaEventObject<MouseEvent>) => {
     // Current X,Y canvas click position
     // Problem - ev.evt.offsetX dosent work, meanwhile i use pageX
-    const xPosition = ev.evt.pageX - 250;
-    const yPosition = ev.evt.pageY - 50;
-
+    const xPosition = ev.evt.pageX - 50;
+    const yPosition = ev.evt.pageY - 60;
+    
     // Draw tool
     // Handle Pen Formation Drawing
     if (this.state.currTool === 'pen') {
@@ -186,6 +207,7 @@ class NewProject extends Component {
           formation: [...this.state.formation, xPosition, yPosition],
         },
       });
+      globalService.updateLayer(this.state.currLayer.id, this.state.formation); 
     }
 
     // Handle Select/Deslect Canvas Object
@@ -261,6 +283,7 @@ class NewProject extends Component {
       selectedShapeName,
       currElementCoords,
       itemRotaionDeg,
+      showLayersBar
     } = this.state;
 
     return (
@@ -279,40 +302,47 @@ class NewProject extends Component {
         addLayer={this.addLayer}
         handleUndo={this.handleUndo}
         handleRedo={this.handleRedo}
-        
+        currTool={currTool}
         handleGrid={this.handleGrid}
         handleItemRotaionClockwise={this.handleItemRotaionClockwise}
         handleItemRotaionCounterClockwise={this.handleItemRotaionCounterClockwise}
         showGrid={showGrid}
         />
 
+        <div className={showLayersBar ? "layers-bar active" : "layers-bar"}>
         <LayersBar
+        
         layers={layers}
         selectLayer={this.selectLayer}
+        handleShowLayer={this.handleShowLayer}
         />
+        </div>
+        
 
         <div className="canvas-area">
+          {console.log(window.innerWidth, window.innerHeight)}
           <Stage
-            width={window.innerWidth - 250}
-            height={window.innerHeight - 100}
+            width={showLayersBar ? window.innerWidth - 268 : window.innerWidth - 70}
+            height={window.innerHeight - 61.5}
             onContentMousedown={this.handleMouseDown}
           >
             <Layer>
               <BgImage url={img} />
             </Layer>
             <CanvasGridLayer
-              width={window.innerWidth - 250}
-              hieght={window.innerHeight - 100}
+              width={showLayersBar ? window.innerWidth - 268 : window.innerWidth - 70}
+              hieght={window.innerHeight - 61.5}
               showGrid={showGrid}
             />
             <Layer>
-              {!loading && (
-                <Line x={0} y={0} points={currLayer.formation} stroke="black" />
-              )}
+            {layers[0] && layers.map(layer => (
+                layer.show && <Line x={0} y={0} points={layer.formation} stroke="black" key={layer.id} style={(layer.show) ? '' : {display: "none"}}/>
+                ))}
             </Layer>
             <Layer>
               {rectangels[0] &&
                 rectangels.map((rect, idx) => (
+                  <>
                   <Rect
                     shapeProps={rect}
                     isSelected={rect.name === selectedShapeName}
@@ -342,6 +372,16 @@ class NewProject extends Component {
                       this.setState({ selectedShapeName: rect.name });
                     }}
                   />
+                  <Text
+                        x={rect.x + (0.25 * rect.width)}
+                        y={rect.y + (0.5 * rect.height)}
+                        fill={
+                          selectedShapeName === rect.name ? 'yellow' : 'black'
+                        }
+                        text={rect.name}
+                        fontSize={16}
+                      />
+                  </>
                 ))}
             </Layer>
             <Layer>
@@ -357,7 +397,12 @@ class NewProject extends Component {
                         stroke={
                           selectedShapeName === item.name ? 'yellow' : 'black'
                         }
-                        fill="green"
+                        strokeWidth={1}
+                        fillRadialGradientStartPoint={{x: 0, y: 0}}
+                        fillRadialGradientEndPoint={{x: 0, y: 0}}
+                        fillRadialGradientStartRadius={0}
+                        fillRadialGradientEndRadius={item.radiusInMeters}
+                        fillRadialGradientColorStops={[0, '#fdffa6', 0.5, 'rgba(253, 255, 166, .9)', 0.7, 'rgba(253, 255, 166, .7)', 0.9, 'rgba(253, 255, 166, .4)',   1, 'rgba(255, 255, 255, .1)']}
                         key={idx}
                         onDragStart={() => {
                           this.setState({
@@ -412,7 +457,11 @@ class NewProject extends Component {
                           context.closePath();
                           context.fillStrokeShape(shape);
                         }}
-                        fill="#00D2FF"
+                        fillRadialGradientStartPoint={{x: 0, y: 0}}
+                        fillRadialGradientEndPoint={{x: 0, y: 0}}
+                        fillRadialGradientStartRadius={0}
+                        fillRadialGradientEndRadius={item.radiusInMeters}
+                        fillRadialGradientColorStops={[0, '#fdffa6', 0.5, 'rgba(253, 255, 166, .9)', 0.7, 'rgba(253, 255, 166, .7)', 0.9, 'rgba(253, 255, 166, .4)',   1, 'rgba(255, 255, 255, .1)']}
                         stroke={
                           selectedShapeName === item.name ? 'yellow' : 'black'
                         }

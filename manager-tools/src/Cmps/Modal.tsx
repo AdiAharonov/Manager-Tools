@@ -20,8 +20,11 @@ export const Modal:React.FC<ModalProps> = ({showModal, modalName, handleCloseMod
     return (
         
         <div className="global-modal" style={display} >
-            <div className="modal-background" onClick={() => handleCloseModal()}></div>
-        { showModal && <div className="modal-body">
+            
+          {modalName !== 'pen' && modalName !== 'layers' && <div className="modal-background" onClick={() => handleCloseModal()}></div>} 
+          {modalName === 'pen' && handleCloseModal()} 
+          {modalName === 'layers' && handleCloseModal()} 
+        { showModal && modalName !== 'pen' && modalName !== 'layers' && <div className="modal-body">
         
             <h2>{modalName}</h2>
             { modalName === 'rect' && <RectToolForm handleCloseModal={handleCloseModal} createRect={createRect}/>}

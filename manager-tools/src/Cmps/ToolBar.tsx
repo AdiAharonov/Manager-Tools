@@ -3,6 +3,7 @@ import {UploadImageTool} from './ToolBarTools/UploadImageTool';
 import {PenTool} from './ToolBarTools/PenTool';
 import {RectTool} from './ToolBarTools/RectTool';
 import {UploadItemTool} from './ToolBarTools/UploadItemTool';
+import {LayersTool} from './ToolBarTools/LayersTool';
 
 interface ToolBarProps  {
     uploadImg: Function,
@@ -39,6 +40,7 @@ export const ToolBar:React.FC<ToolBarProps> = ({uploadImg, setCurrTool}) => {
             <PenTool handleClick={handleClick}/>
             <RectTool handleClick={handleClick}/>
             <UploadItemTool handleClick={handleClick}/>
+            <LayersTool handleClick={handleClick}/>
             </div>
         </>
     )

@@ -15,7 +15,7 @@ interface CanvasOptionsProps {
   handleItemRotaionClockwise: Function;
   handleItemRotaionCounterClockwise: Function;
   handleGrid: Function;
-
+  currTool: string;
   showGrid: boolean;
 }
 
@@ -27,37 +27,60 @@ export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
   handleItemRotaionCounterClockwise,
   handleGrid,
   showGrid,
+  currTool,
 }) => {
   return (
     <>
       <div className="canvas-options">
-        <button className="canvas-options-button" onClick={() => handleUndo()}>
-          <UndoIcon />
-        </button>
-        <button className="canvas-options-button" onClick={() => handleRedo()}>
-          <RedoIcon />
-        </button>
-        <button className="canvas-options-button" onClick={() => addLayer()}>
+
+      <button className="canvas-options-button" onClick={() => addLayer()}>
           <AddLayerIcon />
-        </button>
-        <button
-          className="canvas-options-button"
-          onMouseDown={(e) => handleItemRotaionClockwise(e)}
-          onMouseUp={(e) => handleItemRotaionClockwise(e)}
-        >
-          <RotateClockwiseIcon />
-        </button>
-        <button
-          className="canvas-options-button"
-          onMouseDown={(e) => handleItemRotaionCounterClockwise(e)}
-          onMouseUp={(e) => handleItemRotaionCounterClockwise(e)}
-        >
-          <RotateCounterIcon />
         </button>
 
         <button className="canvas-options-button" onClick={() => handleGrid()}>
           {showGrid ? <ShowGridIcon /> : <ShowGridIcon />}
         </button>
+
+        
+        {currTool === 'pen' && (
+          <>
+            <button
+              className="canvas-options-button"
+              onClick={() => handleUndo()}
+            >
+              <UndoIcon />
+            </button>
+            <button
+              className="canvas-options-button"
+              onClick={() => handleRedo()}
+            >
+              <RedoIcon />
+            </button>
+          </>
+        )}
+
+        {currTool === 'rect' && <></>}
+
+        {currTool === 'upload item' && (
+          <>
+            <button
+              className="canvas-options-button"
+              onMouseDown={(e) => handleItemRotaionClockwise(e)}
+              onMouseUp={(e) => handleItemRotaionClockwise(e)}
+            >
+              <RotateClockwiseIcon />
+            </button>
+            <button
+              className="canvas-options-button"
+              onMouseDown={(e) => handleItemRotaionCounterClockwise(e)}
+              onMouseUp={(e) => handleItemRotaionCounterClockwise(e)}
+            >
+              <RotateCounterIcon />
+            </button>
+          </>
+        )}
+
+       
       </div>
     </>
   );

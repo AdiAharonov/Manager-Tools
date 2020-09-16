@@ -14,13 +14,14 @@ const getGLayers = () => {
 let gLayerIdx = 1;
 
 // Layers on the canvas
-const gLayers: { id: number, name: string; formation: number[] }[] = [
-  {id: gLayerIdx, name: 'Default Layer', formation: [] },
+const gLayers: { id: number, name: string; formation: number[]; show: boolean }[] = [
+  {id: gLayerIdx, name: 'Default Layer', formation: [], show: true },
 ];
 
 
+
 const createNewLayer = () => {
-  const newLayer = { id: ++gLayerIdx, name: `New Layer ${gLayerIdx}`, formation: [] };
+  const newLayer = { id: ++gLayerIdx, name: `New Layer ${gLayerIdx}`, formation: [], show: true };
   gLayers.push(newLayer);
   return gLayers;
 };
@@ -28,11 +29,17 @@ const createNewLayer = () => {
 const updateLayer = (id: number, formation: number[]) => {
   const layerIdx = gLayers.findIndex((layer) => layer.id === id);
   gLayers[layerIdx].formation = formation;
+  
 };
+
+const handleShowLayer = (id: number, show: boolean) => {
+  const layerIdx = gLayers.findIndex((layer) => layer.id === id);
+  gLayers[layerIdx].show = show
+}
 
 // Create & Handle Shapes
 
-const gRectangles: { id: number, name: String, width: number, height: number, x: number, y: number}[] = [];
+const gRectangles: { id: number, name: string, width: number, height: number, x: number, y: number}[] = [];
 const gItems: { id: number, name: String, title: string, radiusInMeters: number, angle: number, x: number, y: number, endPoints?: { x1: number, y1: number, x2: number, y2: number}}[] = [];
 let gCanvasObjectId: number = 101
 
@@ -45,9 +52,9 @@ const createRect = ( name: string, width: number, height: number) => {
     gRectangles.push(newRect);
 }
 
-const updateRectangels = (rectangel: { id: number; name: String; width: number; height: number; x: number; y: number; }, currCoords: { x: number, y: number}) => {
+const updateRectangels = (rectangel: { id: number; name: string; width: number; height: number; x: number; y: number; }, currCoords: { x: number, y: number}) => {
   const currRectIdx = gRectangles.findIndex(rect => rect === rectangel);
-  const updatedRect: { id: number; name: String; width: number; height: number; x: number; y: number; } = { id: rectangel.id, name: rectangel.name, width: rectangel.width, height: rectangel.height, x: currCoords.x, y: currCoords.y}
+  const updatedRect: { id: number; name: string; width: number; height: number; x: number; y: number; } = { id: rectangel.id, name: rectangel.name, width: rectangel.width, height: rectangel.height, x: currCoords.x, y: currCoords.y}
   gRectangles.splice(currRectIdx, 1);
   gRectangles.push(updatedRect);
   return gRectangles;
@@ -121,5 +128,6 @@ export const globalService = {
   createItem,
   findCanvasObj,
   updateItems,
-  validateCanvasObjectName
+  validateCanvasObjectName,
+  handleShowLayer
 };

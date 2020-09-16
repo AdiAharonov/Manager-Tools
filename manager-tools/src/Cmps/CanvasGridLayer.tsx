@@ -36,7 +36,7 @@ export const CanvasGridLayer: React.FC<CanvasGridLayerProps> = ({ width, hieght,
     
   return (
   <Layer>
-      { showGrid && grid.w[0] && grid.w.map((line, idx) =>  <Line key={idx}  x={0} y={0} points={line} stroke="#0010697d" strokeWidth={0.5} />)}
-      { showGrid && grid.h[0] && grid.h.map((line, idx) =>  <Line key={idx}  x={0} y={0} points={line} stroke="#0010697d" strokeWidth={0.5} />)}
+      { showGrid && grid.w[0] && grid.w.map((line, idx) =>  <Line key={idx}  x={0} y={0} points={line} stroke="#1a1c20" strokeWidth={1} />)}
+      { showGrid && grid.h[0] && grid.h.map((line, idx) =>  <Line key={idx}  x={0} y={0} points={line} stroke="#1a1c20" strokeWidth={1} />)}
   </Layer>
   )};
