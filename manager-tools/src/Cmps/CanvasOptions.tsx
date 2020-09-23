@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState} from 'react';
+import { globalService } from '../Services/globalServices';
 
 import { ReactComponent as UndoIcon } from '../assets/icons/undo.svg';
 import { ReactComponent as RedoIcon } from '../assets/icons/redo.svg';
 import { ReactComponent as AddLayerIcon } from '../assets/icons/add-layer.svg';
 import { ReactComponent as RotateCounterIcon } from '../assets/icons/rotate-left.svg';
 import { ReactComponent as RotateClockwiseIcon } from '../assets/icons/rotate-right.svg';
-import { ReactComponent as ShowGridIcon } from '../assets/icons/show-grid.svg';
+import { ReactComponent as ShowGridIcon } from '../assets/icons/grid.svg';
+import { ReactComponent as HideGridIcon } from '../assets/icons/grid-hidden.svg';
+import { ReactComponent as BucketPaint } from '../assets/icons/bucket-paint.svg';
+import InputColor from 'react-input-color';
 // import { ReactComponent as Icon } from '../../assets/icons/pen.svg';
 
 interface CanvasOptionsProps {
@@ -17,6 +21,7 @@ interface CanvasOptionsProps {
   handleGrid: Function;
   currTool: string;
   showGrid: boolean;
+  selectedShape: {id: number, name: string, type: string};
 }
 
 export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
@@ -28,17 +33,33 @@ export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
   handleGrid,
   showGrid,
   currTool,
+  selectedShape
 }) => {
+const [gColor, setGColor] = useState({rgba: {}, hex: ''});
+const handleChnageColor = () => {
+
+}
   return (
     <>
+    {console.log(selectedShape)}
       <div className="canvas-options">
+
+        <div className="color-picker">
+          <BucketPaint fill={gColor.hex}/>
+          <InputColor
+          onChange={setGColor}
+        initialValue="#5e72e4"
+         />
+         </div>
+
+        
 
       <button className="canvas-options-button" onClick={() => addLayer()}>
           <AddLayerIcon />
         </button>
 
         <button className="canvas-options-button" onClick={() => handleGrid()}>
-          {showGrid ? <ShowGridIcon /> : <ShowGridIcon />}
+          {showGrid ? <HideGridIcon /> : <ShowGridIcon />}
         </button>
 
         
@@ -61,7 +82,7 @@ export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
 
         {currTool === 'rect' && <></>}
 
-        {currTool === 'upload item' && (
+        {selectedShape.type === 'item' && (
           <>
             <button
               className="canvas-options-button"

@@ -49,7 +49,7 @@ interface State {
   currElementCoords: { x: number; y: number };
   showGrid: boolean;
   items: ItemInterface[];
-  selectedShapeName: String;
+  selectedShape: {id: number, name: string, type: string};
   itemRotaionDeg: number;
   intervalId: NodeJS.Timeout;
   showLayersBar: boolean;
@@ -69,7 +69,7 @@ class NewProject extends Component {
     currElementCoords: { x: 0, y: 0 },
     showGrid: true,
     items: [],
-    selectedShapeName: '',
+    selectedShape: {id: 0, name: '', type: ''},
     itemRotaionDeg: 0,
     intervalId: setInterval(() => {}, 100),
     showLayersBar: false
@@ -164,10 +164,12 @@ class NewProject extends Component {
 
   handleItemRotaionClockwise = (e: MouseEvent) => {
     e.preventDefault();
+    const currItem = globalService.getItemById(this.state.selectedShape.id)
 
-    if (e.type === 'mousedown') {
+    if (e.type === 'mousedown' && this.state.selectedShape.name) {
       const rotation: NodeJS.Timeout = setInterval(() => {
         this.setState({ itemRotaionDeg: this.state.itemRotaionDeg - 1 });
+        this.updateItems(currItem);
       }, 50);
       this.setState({ intervalId: rotation });
     }
@@ -175,12 +177,15 @@ class NewProject extends Component {
       clearInterval(this.state.intervalId);
     }
   };
+
   handleItemRotaionCounterClockwise = (e: MouseEvent) => {
     e.preventDefault();
+    const currItem = globalService.getItemById(this.state.selectedShape.id)
 
-    if (e.type === 'mousedown') {
+    if (e.type === 'mousedown' && this.state.selectedShape.name) {
       const rotation: NodeJS.Timeout = setInterval(() => {
         this.setState({ itemRotaionDeg: this.state.itemRotaionDeg + 1 });
+        this.updateItems(currItem);
       }, 50);
       this.setState({ intervalId: rotation });
     }
@@ -213,11 +218,14 @@ class NewProject extends Component {
     // Handle Select/Deslect Canvas Object
 
     const selectedCanvasObj = globalService.findCanvasObj(xPosition, yPosition);
-    this.setState({ selectedShapeName: selectedCanvasObj.name });
+    this.setState({ selectedShape: {id: selectedCanvasObj.id, name: selectedCanvasObj.name, type: selectedCanvasObj.type}, currElementCoords: {x: selectedCanvasObj.x, y: selectedCanvasObj.y} });
+    if (selectedCanvasObj.rotationAngle) this.setState({ itemRotaionDeg: selectedCanvasObj.rotationAngle});
     // console.log(selectedCanvasObj)
   };
 
   // Shapes
+
+  // Rectangel "Rooms?"
 
   createRect = (name: string, width: number, height: number) => {
     globalService.createRect(name, width, height);
@@ -232,6 +240,8 @@ class NewProject extends Component {
     this.setState({ rectangels: updatedRectangels });
   };
 
+  // Items "camreas, smoke detectors, wifi..."
+
   createItem = (
     name: String,
     title: string,
@@ -243,10 +253,11 @@ class NewProject extends Component {
   };
 
   updateItems = (item: ItemInterface) => {
-    console.log(this.state.currElementCoords);
+    
     const updatedItems: ItemInterface[] = globalService.updateItems(
       item,
-      this.state.currElementCoords
+      this.state.currElementCoords,
+      this.state.itemRotaionDeg
     );
     this.setState({ items: updatedItems });
   };
@@ -280,7 +291,7 @@ class NewProject extends Component {
       isDraggin,
       showGrid,
       items,
-      selectedShapeName,
+      selectedShape,
       currElementCoords,
       itemRotaionDeg,
       showLayersBar
@@ -294,15 +305,14 @@ class NewProject extends Component {
           handleOpenModal={this.handleOpenModal}
         />
 
-        {/* <h2>{currTool}</h2> */}
-        {/* <h2>{selectedShapeName}</h2> */}
-        {/* <h2>{itemRotaionDeg}</h2> */}
+        {/* <h1>{loading ? 'Wait A Sec..' : ''}</h1> */}
         
         <CanvasOptions 
         addLayer={this.addLayer}
         handleUndo={this.handleUndo}
         handleRedo={this.handleRedo}
         currTool={currTool}
+        selectedShape={selectedShape}
         handleGrid={this.handleGrid}
         handleItemRotaionClockwise={this.handleItemRotaionClockwise}
         handleItemRotaionCounterClockwise={this.handleItemRotaionCounterClockwise}
@@ -317,20 +327,30 @@ class NewProject extends Component {
         handleShowLayer={this.handleShowLayer}
         />
         </div>
+
+        <div className="info">
+          <h5>Tool: {currTool}</h5>
+          <h5>Layer: {currLayer.name}</h5>
+          <h5>Shape: {selectedShape.name}</h5>
+          <h5> X: {currElementCoords.x} Y: {currElementCoords.y}</h5>
+          <h5>          {"Rotation degree: " + itemRotaionDeg}</h5>
+          
+         
+        </div>
+
         
 
         <div className="canvas-area">
-          {console.log(window.innerWidth, window.innerHeight)}
           <Stage
-            width={showLayersBar ? window.innerWidth - 268 : window.innerWidth - 70}
-            height={window.innerHeight - 61.5}
+            width={showLayersBar ? window.innerWidth - 252 : window.innerWidth - 54}
+            height={window.innerHeight - 62}
             onContentMousedown={this.handleMouseDown}
           >
             <Layer>
               <BgImage url={img} />
             </Layer>
             <CanvasGridLayer
-              width={showLayersBar ? window.innerWidth - 268 : window.innerWidth - 70}
+              width={showLayersBar ? window.innerWidth - 252 : window.innerWidth - 54}
               hieght={window.innerHeight - 61.5}
               showGrid={showGrid}
             />
@@ -342,10 +362,10 @@ class NewProject extends Component {
             <Layer>
               {rectangels[0] &&
                 rectangels.map((rect, idx) => (
-                  <>
+                  
                   <Rect
                     shapeProps={rect}
-                    isSelected={rect.name === selectedShapeName}
+                    isSelected={rect.id === selectedShape.id}
                     draggable
                     key={idx}
                     x={rect.x}
@@ -353,7 +373,7 @@ class NewProject extends Component {
                     width={rect.width}
                     height={rect.height}
                     stroke={
-                      selectedShapeName === rect.name ? 'yellow' : 'black'
+                      selectedShape.id === rect.id ? 'yellow' : ''
                     }
                     fill="#eee"
                     onDragStart={() => {
@@ -369,33 +389,24 @@ class NewProject extends Component {
                       this.updateRectangels(rect);
                     }}
                     onSelect={() => {
-                      this.setState({ selectedShapeName: rect.name });
+                      this.setState({ selectedShape: {id: rect.id, name: rect.name} });
                     }}
                   />
-                  <Text
-                        x={rect.x + (0.25 * rect.width)}
-                        y={rect.y + (0.5 * rect.height)}
-                        fill={
-                          selectedShapeName === rect.name ? 'yellow' : 'black'
-                        }
-                        text={rect.name}
-                        fontSize={16}
-                      />
-                  </>
+                  
                 ))}
             </Layer>
             <Layer>
               {items[0] &&
                 items.map((item, idx) =>
                   !item.angle ? (
-                    <>
+                    
                       <Circle
                         x={item.x}
                         y={item.y}
                         draggable
                         radius={item.radiusInMeters}
                         stroke={
-                          selectedShapeName === item.name ? 'yellow' : 'black'
+                          selectedShape.id === item.id ? 'yellow' : ''
                         }
                         strokeWidth={1}
                         fillRadialGradientStartPoint={{x: 0, y: 0}}
@@ -421,18 +432,9 @@ class NewProject extends Component {
                         }}
                       />
 
-                      <Text
-                        x={item.x + item.radiusInMeters + 10}
-                        y={item.y}
-                        fill={
-                          selectedShapeName === item.name ? 'yellow' : 'black'
-                        }
-                        text={item.title}
-                        fontSize={16}
-                      />
-                    </>
+                      
                   ) : (
-                    <>
+                    
                       <Shape
                         key={idx}
                         x={item.x}
@@ -442,16 +444,16 @@ class NewProject extends Component {
                           context.moveTo(0, 0);
                           context.lineTo(
                             item.radiusInMeters *
-                              Math.cos(itemRotaionDeg * 0.0174532925),
+                              Math.cos(item.rotationAngle * 0.0174532925),
                             item.radiusInMeters *
-                              Math.sin(-itemRotaionDeg * 0.0174532925)
+                              Math.sin(-item.rotationAngle * 0.0174532925)
                           );
                           context.arc(
                             0,
                             0,
                             item.radiusInMeters,
-                            ((360 - itemRotaionDeg) / 180) * Math.PI,
-                            ((item.angle - itemRotaionDeg) / 180) * Math.PI,
+                            ((360 - item.rotationAngle) / 180) * Math.PI,
+                            ((item.angle - item.rotationAngle) / 180) * Math.PI,
                             false
                           );
                           context.closePath();
@@ -463,7 +465,7 @@ class NewProject extends Component {
                         fillRadialGradientEndRadius={item.radiusInMeters}
                         fillRadialGradientColorStops={[0, '#fdffa6', 0.5, 'rgba(253, 255, 166, .9)', 0.7, 'rgba(253, 255, 166, .7)', 0.9, 'rgba(253, 255, 166, .4)',   1, 'rgba(255, 255, 255, .1)']}
                         stroke={
-                          selectedShapeName === item.name ? 'yellow' : 'black'
+                          selectedShape.id === item.id ? 'yellow' : ''
                         }
                         strokeWidth={1}
                         draggable
@@ -482,27 +484,9 @@ class NewProject extends Component {
                           });
                           this.updateItems(item);
                         }}
+                        
                       />
-
-                      <Text
-                        x={item.x + item.radiusInMeters + 10}
-                        y={item.y}
-                        fill={
-                          selectedShapeName === item.name ? 'yellow' : 'black'
-                        }
-                        text={item.title}
-                        fontSize={16}
-                      />
-                      <Text
-                        x={item.x + item.radiusInMeters + 10}
-                        y={item.y + 30}
-                        fill={
-                          selectedShapeName === item.name ? 'yellow' : 'black'
-                        }
-                        text={item.angle.toString() + ' Deg'}
-                        fontSize={16}
-                      />
-                    </>
+                    
                   )
                 )}
             </Layer>

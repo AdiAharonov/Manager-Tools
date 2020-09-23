@@ -20,9 +20,9 @@ export const LayersBar:React.FC<LayersBarProps> = ({layers, selectLayer, handleS
             <h3>LAYERS</h3>
            {layers[0] &&
           layers.map((layer, idx) => (
-              <div className={selectedLayerId === layer.id ? 'layer-row selected' : 'layer-row'}>
+              <div className={selectedLayerId === layer.id ? 'layer-row selected' : 'layer-row'} key={idx}>
             <button
-              key={idx}
+              
               id={idx.toString()}
               className="layer"
               onClick={(e) => {
