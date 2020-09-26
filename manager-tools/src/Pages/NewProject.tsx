@@ -26,19 +26,20 @@ import {
 
 // BackGround image for the canvas cmp
 
-const BgImage: React.FC<{ url: string }> = ({ url }) => {
+const BgImage: React.FC<{ url: string; size: {width: number; height: number;}; }> = ({ url, size }) => {
   const [image] = useImage(url);
   return (
     <Image
       image={image}
-      width={window.innerWidth - 250}
-      height={window.innerHeight - 100}
+      width={size.width - 52}
+      height={size.height - 54}
     />
   );
 };
 
 interface State {
   img: string;
+  backgroundImageSize: {width: number; height: number;}
   currTool: string;
   formation: number[];
   currLayer: LayerInterface;
@@ -60,6 +61,7 @@ interface State {
 class NewProject extends Component {
   state: State = {
     img: '',
+    backgroundImageSize: {width: window.innerWidth, height: window.innerHeight},
     currTool: '',
     formation: [],
     currLayer: { id: 101, name: 'Default Layer', formation: [20, 50, 100, 100, 300, 300], show: true },
@@ -100,7 +102,22 @@ class NewProject extends Component {
     this.setState({ img: url });
   };
 
+  // Resize the background image
+
+  incBGImage = () => {
+    if (!this.state.img) return
+    this.setState({ backgroundImageSize: {width: this.state.backgroundImageSize.width + (window.innerWidth / 10), height: this.state.backgroundImageSize.height + (window.innerHeight / 10)}})
+  }
+
+  decBGImage = () => {
+    if (!this.state.img) return
+    this.setState({ backgroundImageSize: {width: this.state.backgroundImageSize.width - (window.innerWidth / 10), height: this.state.backgroundImageSize.height - (window.innerHeight / 10)}})
+  }
+
+  // Handle tool selecting
+
   setCurrTool = (toolName: string) => {
+    this.setState({ selectedShape: {}});
     this.setState({ currTool: toolName });
     this.handleOpenModal(toolName);
     if (toolName === 'layers') {
@@ -242,6 +259,7 @@ class NewProject extends Component {
   createRect = (name: string, width: number, height: number) => {
     globalService.createRect(name, width, height);
     this.setState({ rectangels: globalService.getRectangels() });
+    this.setState({ currTool: '' });
   };
 
   updateRectangels = (rect: RectInterface) => {
@@ -262,6 +280,7 @@ class NewProject extends Component {
   ) => {
     globalService.createItem(name, title, radiusInMeters, angle);
     this.setState({ items: globalService.getItems() });
+    this.setState({ currTool: '' });
   };
 
   updateItems = (item: ItemInterface) => {
@@ -278,7 +297,7 @@ class NewProject extends Component {
 
   handleCloseModal = () => {
     if (this.state.modal.modalTitle) {
-      this.setState({ modal: { modalTitle: '' } });
+      this.setState({ modal: { showModal: false, modalTitle: '' } });
     }
     this.setState({ modal: { showModal: false } });
   };
@@ -306,6 +325,7 @@ class NewProject extends Component {
   render() {
     const {
       img,
+      backgroundImageSize,
       layers,
       modal,
       contextMenu,
@@ -342,6 +362,8 @@ class NewProject extends Component {
         handleItemRotaionClockwise={this.handleItemRotaionClockwise}
         handleItemRotaionCounterClockwise={this.handleItemRotaionCounterClockwise}
         showGrid={showGrid}
+        incBGImage={this.incBGImage}
+        decBGImage={this.decBGImage}
         />
 
         <div className={showLayersBar ? "layers-bar active" : "layers-bar"}>
@@ -374,7 +396,7 @@ class NewProject extends Component {
             }}
           >
             <Layer>
-              <BgImage url={img} />
+              <BgImage url={img} size={backgroundImageSize}/>
             </Layer>
             <CanvasGridLayer
               width={showLayersBar ? window.innerWidth - 252 : window.innerWidth - 54}
@@ -495,7 +517,7 @@ class NewProject extends Component {
                         // fillRadialGradientColorStops={[0, `rgba(${item.color.r},${item.color.g},${item.color.b},100)`, 0.5, `rgba(${item.color.r},${item.color.g},${item.color.b},90)`, 0.7, `rgba(${item.color.r},${item.color.g},${item.color.b},0.8)`, 0.9, `rgba(${item.color.r},${item.color.g},${item.color.b},0.6)`,   1, `rgba(${item.color.r},${item.color.g},${item.color.b},0.2)`]}
 
                         // Simple fill untill gardient fixed
-                        
+
                         fill={`rgba(${item.color.r},${item.color.g},${item.color.b},${item.color.a === '100' ? '100' : `0.${item.color.a}`})`}
                         stroke={
                           selectedShape.id === item.id ? 'yellow' : ''

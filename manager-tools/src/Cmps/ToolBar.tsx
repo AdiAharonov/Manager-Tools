@@ -21,13 +21,19 @@ export const ToolBar:React.FC<ToolBarProps> = ({uploadImg, setCurrTool}) => {
 
         // Turn on/off the current tool
        
-        if (currTool === '' || currTool !== toolName) {
+        // Case: No current tool or chosing a new tool
+        if (currTool === '' || currTool !== toolName ) {
             setNewCurrTool(toolName);
             setCurrTool(toolName);
         }
+        // Case: Clicking on the same tool to turn it off
         if (currTool === toolName) {
             setNewCurrTool('');
             setCurrTool('');
+        }
+        // Case: Creating new shape and immidietly resetting the tool
+        if (currTool === 'rect' || currTool === 'upload item') {
+            setCurrTool(toolName);
         }
         
     

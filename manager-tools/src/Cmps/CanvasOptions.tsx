@@ -1,5 +1,5 @@
-import React, { useState, useEffect} from 'react';
-import { Color } from '../Services/interfaceService';
+import React from 'react';
+
 
 import { ReactComponent as UndoIcon } from '../assets/icons/undo.svg';
 import { ReactComponent as RedoIcon } from '../assets/icons/redo.svg';
@@ -8,9 +8,9 @@ import { ReactComponent as RotateCounterIcon } from '../assets/icons/rotate-left
 import { ReactComponent as RotateClockwiseIcon } from '../assets/icons/rotate-right.svg';
 import { ReactComponent as ShowGridIcon } from '../assets/icons/grid.svg';
 import { ReactComponent as HideGridIcon } from '../assets/icons/grid-hidden.svg';
-// import { ReactComponent as BucketPaint } from '../assets/icons/bucket-paint.svg';
+import { ReactComponent as PlusIcon } from '../assets/icons/plus.svg';
+import { ReactComponent as MinusIcon } from '../assets/icons/minus.svg';
 
-// import { ReactComponent as Icon } from '../../assets/icons/pen.svg';
 
 interface CanvasOptionsProps {
   handleUndo: Function;
@@ -22,6 +22,8 @@ interface CanvasOptionsProps {
   currTool: string;
   showGrid: boolean;
   selectedShape: {id: number, name: string, type: string};
+  incBGImage: Function;
+  decBGImage: Function;
 }
 
 export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
@@ -33,7 +35,9 @@ export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
   handleGrid,
   showGrid,
   currTool,
-  selectedShape
+  selectedShape,
+  incBGImage,
+  decBGImage
 }) => {
 
 
@@ -46,6 +50,14 @@ export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
         
 
         
+      <button className="canvas-options-button" onClick={() => incBGImage()}>
+         <PlusIcon />
+        </button>
+
+      <button className="canvas-options-button" onClick={() => decBGImage()}>
+         <MinusIcon />
+        </button>
+
 
       <button className="canvas-options-button" onClick={() => addLayer()}>
           <AddLayerIcon />
