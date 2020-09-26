@@ -6,6 +6,7 @@ export interface RectInterface {
   x: number;
   y: number;
   type: string;
+  color: string;
 }
 
 export interface LayerInterface {
@@ -25,4 +26,12 @@ export interface ItemInterface {
   y: number;
   rotationAngle: number;
   type: string;
+  color: Color;
+}
+
+export interface Color {
+  r: string;
+  g: string;
+  b: string;
+  a: string;
 }

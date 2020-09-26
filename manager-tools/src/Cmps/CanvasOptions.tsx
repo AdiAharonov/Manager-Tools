@@ -1,5 +1,5 @@
-import React, { useState} from 'react';
-import { globalService } from '../Services/globalServices';
+import React, { useState, useEffect} from 'react';
+import { Color } from '../Services/interfaceService';
 
 import { ReactComponent as UndoIcon } from '../assets/icons/undo.svg';
 import { ReactComponent as RedoIcon } from '../assets/icons/redo.svg';
@@ -8,8 +8,8 @@ import { ReactComponent as RotateCounterIcon } from '../assets/icons/rotate-left
 import { ReactComponent as RotateClockwiseIcon } from '../assets/icons/rotate-right.svg';
 import { ReactComponent as ShowGridIcon } from '../assets/icons/grid.svg';
 import { ReactComponent as HideGridIcon } from '../assets/icons/grid-hidden.svg';
-import { ReactComponent as BucketPaint } from '../assets/icons/bucket-paint.svg';
-import InputColor from 'react-input-color';
+// import { ReactComponent as BucketPaint } from '../assets/icons/bucket-paint.svg';
+
 // import { ReactComponent as Icon } from '../../assets/icons/pen.svg';
 
 interface CanvasOptionsProps {
@@ -35,22 +35,15 @@ export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
   currTool,
   selectedShape
 }) => {
-const [gColor, setGColor] = useState({rgba: {}, hex: ''});
-const handleChnageColor = () => {
 
-}
+
   return (
     <>
-    {console.log(selectedShape)}
+
+    {/* {console.log(gColor)} */}
       <div className="canvas-options">
 
-        <div className="color-picker">
-          <BucketPaint fill={gColor.hex}/>
-          <InputColor
-          onChange={setGColor}
-        initialValue="#5e72e4"
-         />
-         </div>
+        
 
         
 

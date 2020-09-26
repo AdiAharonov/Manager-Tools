@@ -14,6 +14,7 @@ import Konva from 'konva';
 import useImage from 'use-image';
 import { globalService } from '../Services/globalServices';
 import { Modal } from '../Cmps/Modal';
+import { ContextMenu } from '../Cmps/ContextMenu';
 import { CanvasGridLayer } from '../Cmps/CanvasGridLayer';
 import { LayersBar } from '../Cmps/LayersBar';
 import { CanvasOptions } from '../Cmps/CanvasOptions';
@@ -44,6 +45,7 @@ interface State {
   layers: LayerInterface[];
   loading: boolean;
   modal: { showModal: boolean; modalTitle: string };
+  contextMenu: { showContextMenu: boolean; x: number; y: number;};
   rectangels: RectInterface[];
   isDraggin: boolean;
   currElementCoords: { x: number; y: number };
@@ -64,6 +66,7 @@ class NewProject extends Component {
     layers: [],
     loading: true,
     modal: { showModal: false, modalTitle: 'Default' },
+    contextMenu: { showContextMenu: false, x: 0, y: 0 },
     rectangels: [],
     isDraggin: false,
     currElementCoords: { x: 0, y: 0 },
@@ -85,8 +88,8 @@ class NewProject extends Component {
   }
 
   componentDidUpdate(prevState: State) {
-    if (prevState.currTool !== this.state.currTool) {
-
+    if (prevState.items !== this.state.items) {
+     console.log(this.state.items)
       
     }
   }
@@ -220,9 +223,18 @@ class NewProject extends Component {
     const selectedCanvasObj = globalService.findCanvasObj(xPosition, yPosition);
     this.setState({ selectedShape: {id: selectedCanvasObj.id, name: selectedCanvasObj.name, type: selectedCanvasObj.type}, currElementCoords: {x: selectedCanvasObj.x, y: selectedCanvasObj.y} });
     if (selectedCanvasObj.rotationAngle) this.setState({ itemRotaionDeg: selectedCanvasObj.rotationAngle});
-    // console.log(selectedCanvasObj)
-  };
 
+    
+    // Handle right click (context menu over the canvas)
+    
+    if (ev.evt.button === 2 && this.state.selectedShape.name) {
+      this.setState({ contextMenu: {showContextMenu: true, x: ev.evt.pageX + 5, y: ev.evt.pageY + 5}})
+    }
+    if (ev.evt.button !== 2 || !this.state.selectedShape.name) {
+      this.setState({ contextMenu: {showContextMenu: false}})
+    }
+  };
+  
   // Shapes
 
   // Rectangel "Rooms?"
@@ -279,11 +291,24 @@ class NewProject extends Component {
     this.setState({ modal: { showModal: true, modalTitle: title } });
   };
 
+  // ContextMenu
+
+  handleColorChange = (shape: {id: number, name: string, type: string}, color: {r: string, g: string, b: string, a: string, rgba: string}) => {
+     const updatedShapes = globalService.updateBgc(shape, color);
+     if (shape.type === 'rect') {
+       this.setState({ rectangels: updatedShapes})
+     }
+     if (shape.type === 'item') {
+       this.setState({ items: updatedShapes})
+     }
+  }
+
   render() {
     const {
       img,
       layers,
       modal,
+      contextMenu,
       currLayer,
       loading,
       currTool,
@@ -335,7 +360,6 @@ class NewProject extends Component {
           <h5> X: {currElementCoords.x} Y: {currElementCoords.y}</h5>
           <h5>          {"Rotation degree: " + itemRotaionDeg}</h5>
           
-         
         </div>
 
         
@@ -345,6 +369,9 @@ class NewProject extends Component {
             width={showLayersBar ? window.innerWidth - 252 : window.innerWidth - 54}
             height={window.innerHeight - 62}
             onContentMousedown={this.handleMouseDown}
+            onContextMenu={(e) => {
+              e.evt.preventDefault();
+            }}
           >
             <Layer>
               <BgImage url={img} />
@@ -375,7 +402,7 @@ class NewProject extends Component {
                     stroke={
                       selectedShape.id === rect.id ? 'yellow' : ''
                     }
-                    fill="#eee"
+                    fill={rect.color}
                     onDragStart={() => {
                       this.setState({
                         isDraggin: true,
@@ -413,7 +440,7 @@ class NewProject extends Component {
                         fillRadialGradientEndPoint={{x: 0, y: 0}}
                         fillRadialGradientStartRadius={0}
                         fillRadialGradientEndRadius={item.radiusInMeters}
-                        fillRadialGradientColorStops={[0, '#fdffa6', 0.5, 'rgba(253, 255, 166, .9)', 0.7, 'rgba(253, 255, 166, .7)', 0.9, 'rgba(253, 255, 166, .4)',   1, 'rgba(255, 255, 255, .1)']}
+                        fillRadialGradientColorStops={[0, `rgba(${item.color.r},${item.color.g},${item.color.b},100)`, 0.5, `rgba(${item.color.r},${item.color.g},${item.color.b},0.9)`, 0.7, `rgba(${item.color.r},${item.color.g},${item.color.b},0.8)`, 0.9, `rgba(${item.color.r},${item.color.g},${item.color.b},0.6)`,   1, `rgba(${item.color.r},${item.color.g},${item.color.b},0.2)`]}
                         key={idx}
                         onDragStart={() => {
                           this.setState({
@@ -459,11 +486,17 @@ class NewProject extends Component {
                           context.closePath();
                           context.fillStrokeShape(shape);
                         }}
-                        fillRadialGradientStartPoint={{x: 0, y: 0}}
-                        fillRadialGradientEndPoint={{x: 0, y: 0}}
-                        fillRadialGradientStartRadius={0}
-                        fillRadialGradientEndRadius={item.radiusInMeters}
-                        fillRadialGradientColorStops={[0, '#fdffa6', 0.5, 'rgba(253, 255, 166, .9)', 0.7, 'rgba(253, 255, 166, .7)', 0.9, 'rgba(253, 255, 166, .4)',   1, 'rgba(255, 255, 255, .1)']}
+                        // Problem: gardient not works like in circle
+
+                        // fillRadialGradientStartPoint={{x: 0, y: 0}}
+                        // fillRadialGradientEndPoint={{x: 0, y: 0}}
+                        // fillRadialGradientStartRadius={0}
+                        // fillRadialGradientEndRadius={item.radiusInMeters}
+                        // fillRadialGradientColorStops={[0, `rgba(${item.color.r},${item.color.g},${item.color.b},100)`, 0.5, `rgba(${item.color.r},${item.color.g},${item.color.b},90)`, 0.7, `rgba(${item.color.r},${item.color.g},${item.color.b},0.8)`, 0.9, `rgba(${item.color.r},${item.color.g},${item.color.b},0.6)`,   1, `rgba(${item.color.r},${item.color.g},${item.color.b},0.2)`]}
+
+                        // Simple fill untill gardient fixed
+                        
+                        fill={`rgba(${item.color.r},${item.color.g},${item.color.b},${item.color.a === '100' ? '100' : `0.${item.color.a}`})`}
                         stroke={
                           selectedShape.id === item.id ? 'yellow' : ''
                         }
@@ -499,6 +532,14 @@ class NewProject extends Component {
           handleCloseModal={this.handleCloseModal}
           createRect={this.createRect}
           createItem={this.createItem}
+        />
+
+        <ContextMenu
+          showContextMenu={contextMenu.showContextMenu}
+          x={contextMenu.x}
+          y={contextMenu.y}
+          selectedShape={selectedShape}
+          handleColorChange={this.handleColorChange}
         />
       </div>
     );

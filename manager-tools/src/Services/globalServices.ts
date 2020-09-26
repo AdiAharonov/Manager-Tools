@@ -2,6 +2,7 @@ import {
   ItemInterface,
   RectInterface,
   LayerInterface,
+  Color
 } from './interfaceService';
 
 // Home page categories
@@ -67,6 +68,7 @@ const createRect = (name: string, width: number, height: number) => {
     x: 50,
     y: 50,
     type: 'rect',
+    color: '#eee'
   };
   gRectangles.push(newRect);
 };
@@ -84,10 +86,16 @@ const updateRectangels = (
     x: currCoords.x,
     y: currCoords.y,
     type: rectangel.type,
+    color: rectangel.color
   };
   gRectangles.splice(currRectIdx, 1);
   gRectangles.push(updatedRect);
   return gRectangles;
+};
+
+const getRectById = (id: number) => {
+  const rectIdx = gRectangles.findIndex((rect) => rect.id === id);
+  return gRectangles[rectIdx];
 };
 
 // Items
@@ -119,6 +127,7 @@ const updateItems = (
     y: currCoords.y,
     rotationAngle,
     type: currItem.type,
+    color: currItem.color
   };
   gItems.splice(currItemIdx, 1);
   gItems.push(updatedItem);
@@ -141,6 +150,8 @@ const createItem = (
     y: 100,
     rotationAngle: 0,
     type: 'item',
+    color: {r: '253', g: '255', b: '166', a: '100'}
+    
   };
   gItems.push(newItem);
 };
@@ -181,7 +192,6 @@ const findCanvasObj = (xPosition: number, yPosition: number) => {
     const d = Math.hypot(item.x - xPosition, item.y - yPosition);
     if (d <= item.radiusInMeters) currCanvasObj = item;
   });
-  console.log(currCanvasObj);
   return currCanvasObj;
 };
 
@@ -192,9 +202,24 @@ const validateCanvasObjectName = (name: String) => {
 
 // Handle colors
 
-// const updateBgc = (canvasObj) => {
+const updateBgc = (selectedShape: {id: number, name: string, type: string}, newColor: {r: string, g: string, b: string, a: string, rgba: string}) => {
+  
+  if (selectedShape.type === 'rect') {
+    const rectIdx = gRectangles.findIndex((rect) => rect.id === selectedShape.id); 
+    if (gRectangles[rectIdx]) {
+      gRectangles[rectIdx].color =  newColor.rgba;
+    }
+    return gRectangles;
+  }
+  if (selectedShape.type === 'item') {
+    const itemIdx = gItems.findIndex((item) => item.id === selectedShape.id); 
+    if (gItems[itemIdx]) {
+      gItems[itemIdx].color =  {r: newColor.r.toString(), g: newColor.g.toString(), b: newColor.b.toString(), a: newColor.a.toString()};
+     }
+     return gItems;
+  }
 
-// }
+}
 
 export const globalService = {
   getCategories,
@@ -211,4 +236,7 @@ export const globalService = {
   validateCanvasObjectName,
   handleShowLayer,
   getItemById,
+  getRectById,
+  updateBgc,
+
 };
