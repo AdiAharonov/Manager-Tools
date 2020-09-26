@@ -1,4 +1,4 @@
-import React, { Component, MouseEvent } from 'react';
+import React, { Component, MouseEvent, useRef } from 'react';
 import { ToolBar } from '../Cmps/ToolBar';
 import {
   Stage,
@@ -24,10 +24,11 @@ import {
   ItemInterface,
 } from '../Services/interfaceService';
 
+
 // BackGround image for the canvas cmp
 
 const BgImage: React.FC<{ url: string; size: {width: number; height: number;}; }> = ({ url, size }) => {
-  const [image] = useImage(url);
+  const [image] = useImage(url, 'Anonymous');
   return (
     <Image
       image={image}
@@ -36,6 +37,8 @@ const BgImage: React.FC<{ url: string; size: {width: number; height: number;}; }
     />
   );
 };
+
+const stageRef: React.RefObject<Konva.Stage> = React.createRef();
 
 interface State {
   img: string;
@@ -91,7 +94,6 @@ class NewProject extends Component {
 
   componentDidUpdate(prevState: State) {
     if (prevState.items !== this.state.items) {
-     console.log(this.state.items)
       
     }
   }
@@ -322,6 +324,32 @@ class NewProject extends Component {
      }
   }
 
+
+  // Save as image
+
+  handleExportClick = () => {
+    console.log(stageRef.current)
+    if (!stageRef.current) return
+    const dataURL = stageRef.current.toDataURL({
+      mimeType: "image/jpeg",
+      quality: 0,
+      pixelRatio: 2
+    });
+    this.downloadURI(dataURL, "Project");
+  }
+
+  downloadURI = (uri: any, name: string) => {
+    const link = document.createElement("a");
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+
+  
+
   render() {
     const {
       img,
@@ -348,6 +376,7 @@ class NewProject extends Component {
           uploadImg={this.uploadImg}
           setCurrTool={this.setCurrTool}
           handleOpenModal={this.handleOpenModal}
+          handleExportClick={this.handleExportClick}
         />
 
         {/* <h1>{loading ? 'Wait A Sec..' : ''}</h1> */}
@@ -388,6 +417,7 @@ class NewProject extends Component {
 
         <div className="canvas-area">
           <Stage
+           ref={stageRef}
             width={showLayersBar ? window.innerWidth - 252 : window.innerWidth - 54}
             height={window.innerHeight - 62}
             onContentMousedown={this.handleMouseDown}

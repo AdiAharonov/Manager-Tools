@@ -4,16 +4,18 @@ import {PenTool} from './ToolBarTools/PenTool';
 import {RectTool} from './ToolBarTools/RectTool';
 import {UploadItemTool} from './ToolBarTools/UploadItemTool';
 import {LayersTool} from './ToolBarTools/LayersTool';
+import {ExportImageTool} from './ToolBarTools/ExportImageTool';
 import ReactTooltip from "react-tooltip";
 
 interface ToolBarProps  {
     uploadImg: Function,
     setCurrTool: Function,
     handleOpenModal: Function
+    handleExportClick: Function
 }
 
 
-export const ToolBar:React.FC<ToolBarProps> = ({uploadImg, setCurrTool}) => {
+export const ToolBar:React.FC<ToolBarProps> = ({uploadImg, setCurrTool, handleExportClick}) => {
 
     const [currTool, setNewCurrTool] = useState<string>('');
 
@@ -53,6 +55,7 @@ export const ToolBar:React.FC<ToolBarProps> = ({uploadImg, setCurrTool}) => {
             <RectTool handleClick={handleClick}/>
             <UploadItemTool handleClick={handleClick}/>
             <LayersTool handleClick={handleClick}/>
+            <ExportImageTool handleClick={handleExportClick}/>
             
             </div>
         </>
