@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import InputColor from 'react-input-color';
+import { globalService } from '../Services/globalServices';
 
 interface ContextMenuProps {
   showContextMenu: boolean;
@@ -27,9 +28,36 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 
   // Change shape size
 
+
+  // Change shape name
+  const [shapeName, setShapeName] = useState<string>('')
+
+  useEffect(() => {
+    setShapeName(selectedShape.name)
+  }, [selectedShape.name])
+
+  const handleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    ev.preventDefault()
+    const newName = ev.target.value;
+    if (newName !== '') {
+      setShapeName(newName)
+      globalService.HandleShapeName(newName, selectedShape)
+    } else if (newName === '') {
+      setShapeName(newName)
+      globalService.HandleShapeName('Default', selectedShape)
+    }
+    console.log(ev.target)
+  }
+
   return (
     <div className="global-ContextMenu" style={display}>
-      <h3>{selectedShape.name}</h3>
+      { selectedShape.name && <input type="text" value={shapeName} onChange={e => handleChange(e)}/>}
+
+      <div className="shape-size">
+        {/* { selectedShape.type === 'rect' && 
+        
+        } */}
+      </div>
 
       <div className="color-picker">
         <InputColor onChange={setGColor} initialValue="#fdffa6" />

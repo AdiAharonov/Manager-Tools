@@ -2,7 +2,9 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { globalService } from '../Services/globalServices';
 import logo from '../assets/images/logo.png';
+import landingImage from '../assets/images/landing-image.png';
 import logoName from '../assets/images/logo-name.png';
+import SvgAnimationCmp  from '../Cmps/StyleCmps/SvgAnimationCmp';
 export interface HomeProps {}
 
 interface Categorie {
@@ -25,6 +27,7 @@ export const Home: React.FC<HomeProps> = () => {
         <img className="logo" src={logo} alt={logoName} />
         <img className="logo-name" src={logoName} alt="" />
       </div>
+      <SvgAnimationCmp />
       <div className="greeting">
         <h2>Welcome!</h2>
         <h3>What's the plan for today:</h3>

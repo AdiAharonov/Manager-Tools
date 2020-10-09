@@ -200,7 +200,7 @@ const validateCanvasObjectName = (name: String) => {
   if (gItems.find((item) => item.name === name)) return true;
 };
 
-// Handle colors
+// Handle colors (change any shape (rect or item) color)
 
 const updateBgc = (selectedShape: {id: number, name: string, type: string}, newColor: {r: string, g: string, b: string, a: string, rgba: string}) => {
   
@@ -221,6 +221,24 @@ const updateBgc = (selectedShape: {id: number, name: string, type: string}, newC
 
 }
 
+// Handle change for any shape name
+
+const HandleShapeName = (newName: string, selectedShape: {id: number, name: string, type: string}) => {
+
+  if (selectedShape.type === 'rect') {
+    const rectIdx = gRectangles.findIndex((rect) => rect.id === selectedShape.id); 
+    if (gRectangles[rectIdx]) {
+      gRectangles[rectIdx].name =  newName;
+    }
+  }
+  if (selectedShape.type === 'item') {
+    const itemIdx = gItems.findIndex((item) => item.id === selectedShape.id); 
+    if (gItems[itemIdx]) {
+      gItems[itemIdx].name =  newName;
+     }
+  }
+}
+
 export const globalService = {
   getCategories,
   createNewLayer,
@@ -238,5 +256,6 @@ export const globalService = {
   getItemById,
   getRectById,
   updateBgc,
+  HandleShapeName
 
 };
