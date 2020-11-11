@@ -1,0 +1,36 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    color: $clr2;
+    line-height: 1.5em;
+    text-align: center;
+    font-family: noto-reg;
+
+    
+}
+
+body {
+    margin: 0;
+}
+
+img {
+    width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    
+    line-height: 1.2em;
+    margin: 0 0 rem(20px);
+    
+}
+
+h1 {
+    font-size: rem(70px);
+}
+
+p {
+    margin: 0 0 rem(20px);
+    max-width: 60ch;
+}

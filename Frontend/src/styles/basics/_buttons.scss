@@ -1,0 +1,32 @@
+.canvas-options-button {
+  background: none;
+  border: none;
+  outline: none !important;
+  fill: #fff;
+  width: 40px;
+}
+
+
+
+  .tooltip {
+   
+    display: flex;
+    width: auto;
+    position: absolute;
+    left: 0px;
+    top: 0;
+    background-color: rgb(233, 60, 89);
+    border: rgb(189, 27, 89) solid 2px;
+    padding: 2px;
+    border-radius: 10px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity ease-in-out 0.4s;
+    z-index: 99999;
+
+    &:hover {
+      opacity: 1;
+      
+    }
+  }
+

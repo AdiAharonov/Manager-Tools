@@ -1,0 +1,98 @@
+.home {
+  width: 100vw;
+  height: 100vh;
+  background-color: $clr1;
+  background-image: url('../../assets/images/landing-page.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  overflow: hidden;
+  .logo {
+    width: 35px;
+    position: absolute;
+    top: 20px;
+    left: 60px;
+  }
+
+  .logo-name {
+    width: 120px;
+    position: absolute;
+    top: 35px;
+    left: 110px;
+  }
+
+  .landing-image {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 700px;
+  }
+
+  .svg-animation {
+   width: 850px;
+   opacity: 50%;
+   position: absolute;
+   top: -45px;
+   right: -100px;
+  }
+
+  
+
+  .greeting {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-family: solway-bold;
+    color: $clr4;
+  }
+
+  .categories {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+
+    a {text-decoration: none;}
+
+    .categorie {
+        font-family: solway-reg;
+        width: 100%;
+        font-size: rem(24px);
+        cursor: pointer;
+        color: $clr4;
+        margin: 10px 0;
+        transition: all ease-in-out .4s;
+      
+
+      }
+      .categorie:hover {
+        transform: translateX(20px);
+        color: lighten($clr4, 10);
+    } 
+  }
+
+  @include for-mobile-layout {
+    text-align: center;
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+
+      .logo {
+        position: static;
+      }
+      .logo-name {
+        position: static;
+      }
+
+    }
+        .greeting {
+          
+          justify-content: center;
+          align-items: center;
+          
+        }
+  }
+}
