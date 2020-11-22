@@ -16,13 +16,13 @@ app.use(cors());
 
 
 
-app.listen(PORT, () => console.log(`The server os connected on port: ${PORT}`))
+app.listen(PORT, () => console.log(`The server is connected on port: ${PORT}`))
 
 // setup mongoose
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
     useNewUrlParser: true,
-    useUndifiedTopology: true,
+    useUnifiedTopology: true,
     useCreateIndex: true,
 },
 (err) => {
