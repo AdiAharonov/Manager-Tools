@@ -24,6 +24,8 @@ interface CanvasOptionsProps {
   selectedShape: {id: number, name: string, type: string};
   incBGImage: Function;
   decBGImage: Function;
+  setDrawOnLines: Function;
+  drawOnLines: boolean;
 }
 
 export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
@@ -37,14 +39,15 @@ export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
   currTool,
   selectedShape,
   incBGImage,
-  decBGImage
+  decBGImage,
+  setDrawOnLines,
+  drawOnLines
 }) => {
 
 
   return (
     <>
 
-    {/* {console.log(gColor)} */}
       <div className="canvas-options">
 
         
@@ -81,6 +84,13 @@ export const CanvasOptions: React.FC<CanvasOptionsProps> = ({
               onClick={() => handleRedo()}
             >
               <RedoIcon />
+            </button>
+            <button
+              className="canvas-options-button"
+              style={drawOnLines ? {color: "#fff"} : {}}
+              onClick={() => setDrawOnLines()}
+            >
+              Draw On Lines
             </button>
           </>
         )}

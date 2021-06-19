@@ -32,7 +32,7 @@ const BgImage: React.FC<{
 }> = ({ url, size }) => {
   const [image] = useImage(url, 'Anonymous');
   return (
-    <Image image={image} width={size.width - 52} height={size.height - 54} />
+    <Image image={image} width={size.width - 52} height={size.height - 54} draggable />
   );
 };
 
@@ -48,12 +48,14 @@ interface State {
   currLayer: LayerInterface;
   layers: LayerInterface[];
   loading: boolean;
+  drawOnLines: boolean;
   modal: { showModal: boolean; modalTitle: string };
   contextMenu: { showContextMenu: boolean; x: number; y: number };
   rectangels: RectInterface[];
   isDraggin: boolean;
   currElementCoords: { x: number; y: number };
   showGrid: boolean;
+  gridLineDistance: number;
   items: ItemInterface[];
   selectedShape: { id: number; name: string; type: string };
   itemRotaionDeg: number;
@@ -78,12 +80,14 @@ class NewProject extends Component {
     },
     layers: [],
     loading: true,
+    drawOnLines: false,
     modal: { showModal: false, modalTitle: 'Default' },
     contextMenu: { showContextMenu: false, x: 0, y: 0 },
     rectangels: [],
     isDraggin: false,
     currElementCoords: { x: 0, y: 0 },
     showGrid: true,
+    gridLineDistance: 20,
     items: [],
     selectedShape: { id: 0, name: '', type: '' },
     itemRotaionDeg: 0,
@@ -244,11 +248,14 @@ class NewProject extends Component {
     // Draw tool
     // Handle Pen Formation Drawing
     if (this.state.currTool === 'pen') {
+      let pointsToDraw = {xPos: xPosition, yPos: yPosition};
+      if (this.state.drawOnLines) pointsToDraw = globalService.getClosestGridPoint(xPosition, yPosition, this.state.gridLineDistance)
+
       this.setState({
-        formation: [...this.state.formation, xPosition, yPosition],
+        formation: [...this.state.formation, pointsToDraw.xPos, pointsToDraw.yPos],
         currLayer: {
           ...this.state.currLayer,
-          formation: [...this.state.formation, xPosition, yPosition],
+          formation: [...this.state.formation, pointsToDraw.xPos, pointsToDraw.yPos],
         },
       });
       globalService.updateLayer(this.state.currLayer.id, this.state.formation);
@@ -283,6 +290,12 @@ class NewProject extends Component {
       this.setState({ contextMenu: { showContextMenu: false } });
     }
   };
+
+  // Pen options
+
+  setDrawOnLines = () => {
+    this.setState({drawOnLines: !this.state.drawOnLines})
+  }
 
   // Shapes
 
@@ -386,11 +399,13 @@ class NewProject extends Component {
       modal,
       contextMenu,
       currLayer,
+      drawOnLines,
       loading,
       currTool,
       rectangels,
       isDraggin,
       showGrid,
+      gridLineDistance,
       items,
       selectedShape,
       currElementCoords,
@@ -423,6 +438,8 @@ class NewProject extends Component {
           showGrid={showGrid}
           incBGImage={this.incBGImage}
           decBGImage={this.decBGImage}
+          setDrawOnLines={this.setDrawOnLines}
+          drawOnLines={drawOnLines}
         />
 
         <div className={showLayersBar ? 'layers-bar active' : 'layers-bar'}>
@@ -464,6 +481,7 @@ class NewProject extends Component {
               }
               hieght={window.innerHeight - 61.5}
               showGrid={showGrid}
+              gridLineDistance={gridLineDistance}
             />
             <Layer>
               {layers[0] &&

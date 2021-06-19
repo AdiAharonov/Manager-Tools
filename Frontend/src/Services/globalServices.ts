@@ -239,6 +239,15 @@ const HandleShapeName = (newName: string, selectedShape: {id: number, name: stri
   }
 }
 
+// Automate pen drawing (every click goes to the closest grid point)
+
+const getClosestGridPoint = (currX: number, currY: number, distance: number) => {
+  return {
+    xPos: (currX % distance) <= (distance / 2) ? (currX - (currX % distance)) : (currX - (currX % distance) + distance),
+    yPos: (currY % distance) <= (distance / 2) ? (currY - (currY % distance)) : (currY - (currY % distance) + distance)
+  }
+}
+
 export const globalService = {
   getCategories,
   createNewLayer,
@@ -256,6 +265,7 @@ export const globalService = {
   getItemById,
   getRectById,
   updateBgc,
-  HandleShapeName
+  HandleShapeName,
+  getClosestGridPoint
 
 };
